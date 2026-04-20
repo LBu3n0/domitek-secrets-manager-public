@@ -1,0 +1,17 @@
+﻿# NEVER commit these
+.env
+.env.*
+.env.local
+.env.production
+
+# Node.js
+node_modules/
+npm-debug.log
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Secrets
+*.credentials
+project_history.json
