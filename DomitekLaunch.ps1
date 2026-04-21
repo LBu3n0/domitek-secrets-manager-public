@@ -246,16 +246,27 @@ function Step-Update {
     Write-Host ""
     if ($failCount -eq 0) {
         Write-Host "  [OK] Update complete ($successCount files refreshed)." -ForegroundColor Green
+        Write-Host ""
+        Write-Host "  Relaunching with updated version in 2 seconds..." -ForegroundColor Cyan
+        Start-Sleep -Seconds 2
+
+        # Spawn a new DomitekLaunch.ps1 process so the user sees the
+        # refreshed version without having to restart manually. The
+        # NEW process loads the NEW code from disk. This process
+        # (running the OLD in-memory DomitekLaunch) exits cleanly.
+        Start-Process "powershell.exe" `
+            -ArgumentList "-ExecutionPolicy Bypass -NoExit -File `"$VAULT_DIR\DomitekLaunch.ps1`"" `
+            -WorkingDirectory $VAULT_DIR
+
+        return $true
     } else {
         Write-Host "  [PARTIAL] $successCount refreshed, $failCount failed." -ForegroundColor Yellow
         Write-Host "  Check your internet connection and try again." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "  Review the [WARN] messages above. When ready, close this window" -ForegroundColor Yellow
+        Write-Host "  and re-open Domitek Launch from your desktop." -ForegroundColor Yellow
+        return $false
     }
-
-    # DomitekLaunch.ps1 was just overwritten. The current running copy is
-    # still the old one in memory. Tell the user to restart.
-    Write-Host ""
-    Write-Host "  The launch menu has been updated. Please close this window" -ForegroundColor Cyan
-    Write-Host "  and re-open Domitek Launch from your desktop to use the new version." -ForegroundColor Cyan
 }
 
 function Step-ViewVault {
@@ -339,7 +350,10 @@ while ($running) {
             if (Step-LaunchClaude) { $running = $false }
             else { Pause-Menu }
         }
-        "3" { Step-Update; Pause-Menu }
+        "3" {
+            if (Step-Update) { $running = $false }
+            else { Pause-Menu }
+        }
         "4" { Step-ViewVault; Pause-Menu }
         "5" {
             if (Step-RemoveDSM) { $running = $false }
