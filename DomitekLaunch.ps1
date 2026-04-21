@@ -5,7 +5,7 @@ $TOOL_PATH       = "$VAULT_DIR\Domitek-Secrets-Manager.ps1"
 $CONFIG_PATH     = "$VAULT_DIR\config.json"
 $REMOVE_SCRIPT   = "$VAULT_DIR\remove-dsm.ps1"
 $DEV_FLAG        = "$VAULT_DIR\.dev-mode"
-$UPDATE_URL      = "https://raw.githubusercontent.com/LBU3N0/domitek-secrets-manager/main/Install-SecretsManager-v1.5.ps1"
+$UPDATE_BASE_URL = "https://raw.githubusercontent.com/LBu3n0/domitek-secrets-manager-public/main"
 $INSTALLER_TMP   = "$env:TEMP\Install-SecretsManager-latest.ps1"
 
 # Dev-only script search paths (private repo first, Downloads as fallback)
@@ -66,6 +66,17 @@ function Show-Menu {
     $tColor      = if (Test-Path $TOOL_PATH) { "Green" } else { "Red" }
     $devMode     = Test-DevMode
 
+    # Detect first-run state: config exists but launch-claude.ps1 has not
+    # been generated yet. Menu option [2] changes its label so users don't
+    # land in a dead-end error on their first click.
+    $isFirstRun = $false
+    if ($config -and $config.project_path) {
+        $launchScriptPath = Join-Path $config.project_path "launch-claude.ps1"
+        if (-not (Test-Path $launchScriptPath)) {
+            $isFirstRun = $true
+        }
+    }
+
     Clear-Host
     Write-Host ""
     Write-Host "  =============================================" -ForegroundColor DarkGray
@@ -86,8 +97,13 @@ function Show-Menu {
     Write-Host "  [1]  Launch Secrets Manager" -ForegroundColor Cyan
     Write-Host "       Opens the GUI to manage vault secrets" -ForegroundColor DarkGray
     Write-Host ""
-    Write-Host "  [2]  Launch Claude Code" -ForegroundColor Cyan
-    Write-Host "       Injects vault secrets and starts Claude Code" -ForegroundColor DarkGray
+    if ($isFirstRun) {
+        Write-Host "  [2]  Configure Keys (first-run setup required)" -ForegroundColor Yellow
+        Write-Host "       Opens Secrets Manager to store your first secrets" -ForegroundColor DarkGray
+    } else {
+        Write-Host "  [2]  Launch Claude Code" -ForegroundColor Cyan
+        Write-Host "       Injects vault secrets and starts Claude Code" -ForegroundColor DarkGray
+    }
     Write-Host ""
     Write-Host "  [3]  Update Tool" -ForegroundColor Yellow
     Write-Host "       Downloads latest version from GitHub and installs" -ForegroundColor DarkGray
@@ -131,9 +147,17 @@ function Step-LaunchClaude {
     }
     $launchScript = Join-Path $config.project_path "launch-claude.ps1"
     if (-not (Test-Path $launchScript)) {
-        Write-Host "  [ERROR] launch-claude.ps1 not found at: $launchScript" -ForegroundColor Red
-        Write-Host "  Open Secrets Manager and click Store to Vault to regenerate it." -ForegroundColor Yellow
-        return $false
+        # First-run state: config exists but launch-claude.ps1 has not been
+        # generated. Route to the GUI so the user can store their first
+        # secrets. After they click "Store to Vault + Generate Script" in
+        # the GUI, launch-claude.ps1 exists and menu option [2] will relabel
+        # to "Launch Claude Code" on next render.
+        Write-Host ""
+        Write-Host "  First-run setup detected." -ForegroundColor Yellow
+        Write-Host "  Opening Secrets Manager so you can configure your keys..." -ForegroundColor Cyan
+        Write-Host ""
+        Start-Sleep -Seconds 1
+        return Step-LaunchTool
     }
     Write-Host "  Loading vault secrets and starting Claude Code..." -ForegroundColor Cyan
     Start-Process "powershell.exe" `
@@ -144,17 +168,94 @@ function Step-LaunchClaude {
 
 function Step-Update {
     Write-Host ""
-    Write-Host "  Downloading latest installer from GitHub..." -ForegroundColor Cyan
+    Write-Host "  Downloading latest DSM files from GitHub..." -ForegroundColor Cyan
+    Write-Host ""
+
+    # Files that need refreshing on update. Each entry: url suffix, destination.
+    # Destinations use $VAULT_DIR and Get-Config->project_path where needed.
+    $config = Get-Config
+    $projectPath = if ($config -and $config.project_path) { $config.project_path } else { $null }
+
+    $updateFiles = @(
+        @{ src = "DomitekLaunch.ps1";        dst = "$VAULT_DIR\DomitekLaunch.ps1";       hide = $false }
+        @{ src = "DomitekLaunch.bat";        dst = "$VAULT_DIR\DomitekLaunch.bat";       hide = $false }
+        @{ src = "DomitekLaunch.ico";        dst = "$VAULT_DIR\DomitekLaunch.ico";       hide = $false }
+        @{ src = "remove-dsm.ps1";           dst = "$VAULT_DIR\remove-dsm.ps1";          hide = $false }
+        @{ src = "logo_base64.txt";          dst = "$VAULT_DIR\logo_base64.txt";         hide = $true  }
+        @{ src = "template/launch-template.ps1"; dst = "$VAULT_DIR\launch-template.ps1"; hide = $false }
+    )
+
+    # Also refresh the setup guide in the user's project folder if we know it
+    if ($projectPath) {
+        $updateFiles += @{ src = "domitek-setup-guide.md"; dst = "$projectPath\domitek-setup-guide.md"; hide = $false }
+    }
+
+    $successCount = 0
+    $failCount    = 0
+    foreach ($f in $updateFiles) {
+        $url = "$UPDATE_BASE_URL/$($f.src)"
+        try {
+            # If destination is Hidden, clear the attribute before overwrite
+            # so Invoke-WebRequest + file write does not fail.
+            if (Test-Path $f.dst) {
+                try {
+                    $item = Get-Item $f.dst -Force
+                    if ($item.Attributes -band [System.IO.FileAttributes]::Hidden) {
+                        $item.Attributes = $item.Attributes -band (-bnot [System.IO.FileAttributes]::Hidden)
+                    }
+                } catch {}
+            }
+            Invoke-WebRequest -Uri $url -OutFile $f.dst -UseBasicParsing
+            Unblock-File -Path $f.dst -ErrorAction SilentlyContinue
+            # Re-apply Hidden if this file is internal
+            if ($f.hide) {
+                try {
+                    $item = Get-Item $f.dst -Force
+                    $item.Attributes = $item.Attributes -bor [System.IO.FileAttributes]::Hidden
+                } catch {}
+            }
+            Write-Host "  [OK]   $($f.src)" -ForegroundColor Green
+            $successCount++
+        } catch {
+            Write-Host "  [WARN] $($f.src) -- $($_.Exception.Message)" -ForegroundColor Yellow
+            $failCount++
+        }
+    }
+
+    # Refresh the GUI installer last (runs the installer which rewrites the GUI)
+    Write-Host ""
+    Write-Host "  Updating Secrets Manager GUI..." -ForegroundColor Cyan
     try {
-        Invoke-WebRequest -Uri $UPDATE_URL -OutFile $INSTALLER_TMP -UseBasicParsing
+        $installerUrl = "$UPDATE_BASE_URL/Install-SecretsManager-v1.5.ps1"
+        Invoke-WebRequest -Uri $installerUrl -OutFile $INSTALLER_TMP -UseBasicParsing
         Unblock-File -Path $INSTALLER_TMP
-        Write-Host "  Running installer..." -ForegroundColor Cyan
         & $INSTALLER_TMP
-        Write-Host "  [OK] Tool updated successfully." -ForegroundColor Green
+        # Verify the GUI file actually exists post-install
+        if (Test-Path $TOOL_PATH) {
+            Write-Host "  [OK]   Secrets Manager GUI refreshed" -ForegroundColor Green
+            $successCount++
+        } else {
+            Write-Host "  [WARN] GUI installer ran but $TOOL_PATH was not created" -ForegroundColor Yellow
+            $failCount++
+        }
     } catch {
-        Write-Host "  [ERROR] Update failed: $_" -ForegroundColor Red
+        Write-Host "  [WARN] GUI installer failed: $($_.Exception.Message)" -ForegroundColor Yellow
+        $failCount++
+    }
+
+    Write-Host ""
+    if ($failCount -eq 0) {
+        Write-Host "  [OK] Update complete ($successCount files refreshed)." -ForegroundColor Green
+    } else {
+        Write-Host "  [PARTIAL] $successCount refreshed, $failCount failed." -ForegroundColor Yellow
         Write-Host "  Check your internet connection and try again." -ForegroundColor Yellow
     }
+
+    # DomitekLaunch.ps1 was just overwritten. The current running copy is
+    # still the old one in memory. Tell the user to restart.
+    Write-Host ""
+    Write-Host "  The launch menu has been updated. Please close this window" -ForegroundColor Cyan
+    Write-Host "  and re-open Domitek Launch from your desktop to use the new version." -ForegroundColor Cyan
 }
 
 function Step-ViewVault {
@@ -168,7 +269,7 @@ function Step-RemoveDSM {
     if (-not (Test-Path $REMOVE_SCRIPT)) {
         Write-Host "  [ERROR] remove-dsm.ps1 not found at: $REMOVE_SCRIPT" -ForegroundColor Red
         Write-Host "  Run option [3] Update Tool to reinstall it, or download manually:" -ForegroundColor Yellow
-        Write-Host "    https://raw.githubusercontent.com/LBU3N0/domitek-secrets-manager/main/remove-dsm.ps1" -ForegroundColor Gray
+        Write-Host "    https://raw.githubusercontent.com/LBu3n0/domitek-secrets-manager-public/main/remove-dsm.ps1" -ForegroundColor Gray
         return $false
     }
     # Copy remove-dsm to %TEMP% (it will delete C:\DomitekVault)
