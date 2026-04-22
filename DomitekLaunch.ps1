@@ -102,7 +102,7 @@ function Show-Menu {
         Write-Host "       Opens Secrets Manager to store your first secrets" -ForegroundColor DarkGray
     } else {
         Write-Host "  [2]  Launch Claude Code" -ForegroundColor Cyan
-        Write-Host "       Injects vault secrets and starts Claude Code" -ForegroundColor DarkGray
+        Write-Host "       Injects secrets + launches last project. Use [1] to switch." -ForegroundColor DarkGray
     }
     Write-Host ""
     Write-Host "  [3]  Update Tool" -ForegroundColor Yellow
