@@ -28,6 +28,7 @@ $VERSION        = "v1.5"
 $HISTORY_FILE   = "$env:APPDATA\DomitekVault\project_history.json"
 $ROTATION_FILE  = "C:\DomitekVault\rotation.json"
 $LOGO_FILE      = "C:\DomitekVault\logo_base64.txt"
+$CONFIG_FILE    = "C:\DomitekVault\config.json"
 $MAX_HISTORY    = 5
 $FORM_WIDTH     = 620
 
@@ -135,6 +136,42 @@ function Save-History {
     $dir = Split-Path $HISTORY_FILE
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
     $h | ConvertTo-Json | Out-File $HISTORY_FILE -Encoding UTF8
+}
+
+function Save-Config {
+    # Writes C:\DomitekVault\config.json with the current project.
+    # Called after Store to Vault + Generate Script so DomitekLaunch.ps1
+    # (and any other code that reads config.json) knows which project
+    # the user is currently working on.
+    #
+    # Preserves the Hidden attribute if config.json was already hidden
+    # (see setup.ps1 Set-FileHidden helper from earlier today).
+    param($projName, $projPath)
+    $cfg = [ordered]@{
+        project_path = $projPath
+        project_name = $projName
+    }
+    try {
+        # If file exists and is Hidden, clear the attribute before write
+        # so Out-File does not fail.
+        $wasHidden = $false
+        if (Test-Path $CONFIG_FILE) {
+            $item = Get-Item $CONFIG_FILE -Force
+            if ($item.Attributes -band [System.IO.FileAttributes]::Hidden) {
+                $wasHidden = $true
+                $item.Attributes = $item.Attributes -band (-bnot [System.IO.FileAttributes]::Hidden)
+            }
+        }
+        $cfg | ConvertTo-Json | Out-File $CONFIG_FILE -Encoding UTF8
+        # Re-apply Hidden if it was set
+        if ($wasHidden) {
+            $item = Get-Item $CONFIG_FILE -Force
+            $item.Attributes = $item.Attributes -bor [System.IO.FileAttributes]::Hidden
+        }
+        return $true
+    } catch {
+        return $false
+    }
 }
 
 function Refresh-History {
@@ -623,7 +660,16 @@ $btnStore.Add_Click({
         if ($null -ne $projectPath) {
             $nextPub = $nextPublicKeys
             if (Generate-LaunchScript $projectPath $projectName $keys $nextPub) {
-                Set-Status "Stored $stored secret(s) + generated launch-claude.ps1 in $projectPath" ([System.Drawing.Color]::FromArgb(0, 150, 80))
+                # Update config.json so DomitekLaunch.ps1 menu reflects
+                # the project the user just configured. Without this, menu
+                # [2] Launch Claude Code would still point to whichever
+                # project setup.ps1 originally configured.
+                $cfgOK = Save-Config $projectName $projectPath
+                if ($cfgOK) {
+                    Set-Status "Stored $stored secret(s) + generated launch-claude.ps1 in $projectPath" ([System.Drawing.Color]::FromArgb(0, 150, 80))
+                } else {
+                    Set-Status "Stored $stored secret(s) + generated launch-claude.ps1. [WARN] config.json not updated -- menu may still show previous project." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+                }
                 return
             }
         }
