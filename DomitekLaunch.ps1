@@ -265,8 +265,11 @@ function Step-Update {
         # refreshed version without having to restart manually. The
         # NEW process loads the NEW code from disk. This process
         # (running the OLD in-memory DomitekLaunch) exits cleanly.
+        # No -NoExit: the Read-Host loop already keeps PowerShell alive
+        # while waiting for input, and -NoExit caused the menu window
+        # to stay open after user picks an option that returns true.
         Start-Process "powershell.exe" `
-            -ArgumentList "-ExecutionPolicy Bypass -NoExit -File `"$VAULT_DIR\DomitekLaunch.ps1`"" `
+            -ArgumentList "-ExecutionPolicy Bypass -File `"$VAULT_DIR\DomitekLaunch.ps1`"" `
             -WorkingDirectory $VAULT_DIR
 
         return $true
