@@ -254,6 +254,30 @@ function Clear-SecretRows {
     $script:currentY = 5
 }
 
+function Start-InClaudeTerminal {
+    # Launches launch-claude.ps1 in a clean terminal window.
+    # Prefers Windows Terminal (wt.exe) because it defaults to a dark
+    # theme and matches the look users get from the desktop shortcut.
+    # Falls back to powershell.exe in conhost if wt.exe is missing.
+    #
+    # Either way we pass -NoLogo to suppress the Microsoft copyright
+    # banner. The "Install the latest PowerShell" nag is handled inside
+    # launch-template.ps1 via POWERSHELL_UPDATECHECK.
+    param($launchScript, $projectPath)
+
+    $wtExe = Get-Command "wt.exe" -ErrorAction SilentlyContinue
+    if ($wtExe) {
+        # wt.exe: -d sets starting directory, then nested powershell.exe args
+        Start-Process "wt.exe" `
+            -ArgumentList "-d", "`"$projectPath`"", "powershell.exe", "-ExecutionPolicy", "Bypass", "-NoExit", "-NoLogo", "-File", "`"$launchScript`""
+    } else {
+        # Fallback: plain powershell.exe (will appear in conhost, blue)
+        Start-Process "powershell.exe" `
+            -ArgumentList "-NoExit", "-NoLogo", "-ExecutionPolicy", "Bypass", "-File", $launchScript `
+            -WorkingDirectory $projectPath
+    }
+}
+
 function Add-SecretRow {
     param($defaultName = "", $rotationDays = "90")
     $txtName             = New-Object System.Windows.Forms.TextBox
@@ -269,6 +293,10 @@ function Add-SecretRow {
     $txtValue.Size         = New-Object System.Drawing.Size(185, 24)
     $txtValue.PasswordChar = [char]0x25CF
     $txtValue.BorderStyle  = "FixedSingle"
+    # Fire label refresh whenever the value field changes. The button label
+    # at the bottom of the form reads "Generate Script" when all values are
+    # empty, "Store to Vault + Generate Script" when any value has content.
+    $txtValue.Add_TextChanged({ Update-StoreButtonLabel })
 
     $cboRotation              = New-Object System.Windows.Forms.ComboBox
     $cboRotation.Font         = New-Object System.Drawing.Font("Segoe UI", 8)
@@ -633,14 +661,14 @@ $btnStore.Add_Click({
 
         if (-not [string]::IsNullOrEmpty($k)) { $keys += $k }
 
-        # Always save rotation date if key name exists
-        if (-not [string]::IsNullOrEmpty($k)) {
-            Save-Rotation $projectName $k $rotDays
-        }
-
+        # Skip rows that are missing key name OR value -- nothing to store.
         if ([string]::IsNullOrEmpty($k) -or [string]::IsNullOrEmpty($v)) { $skipped++; continue }
 
         New-StoredCredential -Target "${projectName}_${k}" -UserName "domitek" -Password $v -Persist LocalMachine | Out-Null
+        # Rotation timestamp ONLY advances when a value was actually stored.
+        # Previously this ran whenever a key name existed, which caused "89 days left"
+        # to appear even on Store clicks with all values empty.
+        Save-Rotation $projectName $k $rotDays
         $row.Value.Text = ""
         $stored++
         if ($k -match "URL|ANON|WEBHOOK_URL|WEBHOOK_SECRET") { $nextPublicKeys += $k }
@@ -665,17 +693,29 @@ $btnStore.Add_Click({
                 # [2] Launch Claude Code would still point to whichever
                 # project setup.ps1 originally configured.
                 $cfgOK = Save-Config $projectName $projectPath
-                if ($cfgOK) {
-                    Set-Status "Stored $stored secret(s) + generated launch-claude.ps1 in $projectPath" ([System.Drawing.Color]::FromArgb(0, 150, 80))
+                # Status message is HONEST about what happened based on
+                # actual stored count. "Stored 0 secrets + generated script"
+                # is misleading -- if nothing was stored, say so.
+                if ($stored -gt 0) {
+                    $msg = "Stored $stored secret(s) + generated launch-claude.ps1 in $projectPath"
                 } else {
-                    Set-Status "Stored $stored secret(s) + generated launch-claude.ps1. [WARN] config.json not updated -- menu may still show previous project." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+                    $msg = "Generated launch-claude.ps1 in $projectPath. No values provided -- vault unchanged."
+                }
+                if ($cfgOK) {
+                    Set-Status $msg ([System.Drawing.Color]::FromArgb(0, 150, 80))
+                } else {
+                    Set-Status "$msg [WARN] config.json not updated -- menu may still show previous project." ([System.Drawing.Color]::FromArgb(180, 120, 0))
                 }
                 return
             }
         }
     }
 
-    Set-Status "Stored $stored secret(s) for [$projectName]. Values cleared." ([System.Drawing.Color]::FromArgb(0, 150, 80))
+    if ($stored -gt 0) {
+        Set-Status "Stored $stored secret(s) for [$projectName]. Values cleared." ([System.Drawing.Color]::FromArgb(0, 150, 80))
+    } else {
+        Set-Status "No values provided -- nothing stored. Enter secret values first." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+    }
 })
 
 $btnClose           = New-Object System.Windows.Forms.Button
@@ -686,6 +726,26 @@ $btnClose.Size      = New-Object System.Drawing.Size(109, 36)
 $btnClose.FlatStyle = "Flat"
 $btnClose.BackColor = [System.Drawing.Color]::White
 $btnClose.Add_Click({ $form.Close() })
+
+function Update-StoreButtonLabel {
+    # Scans secret rows; sets button label based on whether any value is populated.
+    # Empty values across the board  -> "Generate Script"   (will not touch vault)
+    # At least one populated value   -> "Store to Vault + Generate Script"
+    # Called on every Value field TextChanged event so the label stays honest
+    # about what the click will actually do.
+    $hasValue = $false
+    foreach ($row in $secretRows) {
+        if (-not [string]::IsNullOrWhiteSpace($row.Value.Text)) {
+            $hasValue = $true
+            break
+        }
+    }
+    if ($hasValue) {
+        $btnStore.Text = "Store to Vault + Generate Script"
+    } else {
+        $btnStore.Text = "Generate Script"
+    }
+}
 
 function Generate-LaunchScript {
     param($projectPath, $projectName, $keys, $nextPublicKeys)
@@ -769,9 +829,7 @@ $btnLaunch.Add_Click({
     if (-not (Test-AndRegenerate $projectPath $projName)) { return }
     $launchScript = Join-Path $projectPath "launch-claude.ps1"
     $form.Close()
-    Start-Process "powershell.exe" `
-        -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-File", $launchScript `
-        -WorkingDirectory $projectPath
+    Start-InClaudeTerminal -launchScript $launchScript -projectPath $projectPath
 })
 
 $btnVSCode           = New-Object System.Windows.Forms.Button

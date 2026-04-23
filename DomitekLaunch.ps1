@@ -160,9 +160,20 @@ function Step-LaunchClaude {
         return Step-LaunchTool
     }
     Write-Host "  Loading vault secrets and starting Claude Code..." -ForegroundColor Cyan
-    Start-Process "powershell.exe" `
-        -ArgumentList "-ExecutionPolicy Bypass -NoExit -File `"$launchScript`"" `
-        -WorkingDirectory $config.project_path
+    # Prefer Windows Terminal for a clean dark-theme window matching the
+    # desktop shortcut. Fallback to powershell.exe in conhost if wt.exe
+    # is missing (some Windows 10 builds). Either way, -NoLogo suppresses
+    # the Microsoft copyright banner; the "Install latest PowerShell" nag
+    # is handled inside launch-template.ps1 via POWERSHELL_UPDATECHECK.
+    $wtExe = Get-Command "wt.exe" -ErrorAction SilentlyContinue
+    if ($wtExe) {
+        Start-Process "wt.exe" `
+            -ArgumentList "-d", "`"$($config.project_path)`"", "powershell.exe", "-ExecutionPolicy", "Bypass", "-NoExit", "-NoLogo", "-File", "`"$launchScript`""
+    } else {
+        Start-Process "powershell.exe" `
+            -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-NoLogo", "-File", $launchScript `
+            -WorkingDirectory $config.project_path
+    }
     return $true
 }
 
