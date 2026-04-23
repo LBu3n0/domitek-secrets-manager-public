@@ -703,6 +703,28 @@ $btnStore.Add_Click({
         if ($dlg.ShowDialog() -eq "OK") { $projectPath = $dlg.SelectedPath }
     }
 
+    # Distinguish "fresh project with template defaults" from
+    # "existing project being regenerated":
+    #   Fresh project  -> no stored-this-click, no existing vault keys
+    #                    -> treat form rows as template defaults, emit []
+    #   Regenerate     -> no stored-this-click, BUT vault already has keys
+    #                    -> honor the form-row keys so the launch script
+    #                       still knows what to load from the vault
+    # Only applies when nothing was stored THIS click. If the user stored
+    # anything, $keys already reflects intent.
+    if ($stored -eq 0 -and $keys.Count -gt 0) {
+        $existingVaultLines = cmdkey /list 2>$null
+        $existingKeys = $existingVaultLines | Select-String "target=" | ForEach-Object {
+            $t = ($_ -replace ".*target=", "" -replace "\s.*", "").Trim()
+            if ($t -like "${projectName}_*") { $t -replace "^${projectName}_", "" }
+        } | Where-Object { $_ }
+        if ($existingKeys.Count -eq 0) {
+            # Fresh project: form rows are template defaults, not user intent.
+            $keys = @()
+            $nextPublicKeys = @()
+        }
+    }
+
     if ($null -ne $projectPath) {
         $nextPub = $nextPublicKeys
         if (Generate-LaunchScript $projectPath $projectName $keys $nextPub) {
