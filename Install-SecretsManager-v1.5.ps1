@@ -641,12 +641,25 @@ $btnStore.Add_Click({
     }
 
     $projectPath = $null
-    if ([System.IO.Path]::IsPathRooted($projectName) -and (Test-Path $projectName)) {
+    if ([System.IO.Path]::IsPathRooted($projectName)) {
+        # Rooted path: user typed or browsed to a specific folder.
+        # Create it if missing so we respect the user's stated intent
+        # instead of silently falling through to the browse dialog.
+        if (-not (Test-Path $projectName)) {
+            try {
+                New-Item -ItemType Directory -Path $projectName -Force -ErrorAction Stop | Out-Null
+            } catch {
+                Set-Status "ERROR: Could not create project folder: $($_.Exception.Message)" ([System.Drawing.Color]::Red)
+                return
+            }
+        }
         $projectPath = $projectName
         $projectName = Split-Path $projectName -Leaf
     } elseif (Test-Path "C:\Vault\$projectName") {
+        # Short-name legacy path: C:\Vault\<name> exists.
         $projectPath = "C:\Vault\$projectName"
     }
+    # If still null, the folder-browser dialog below handles it.
 
     $stored  = 0
     $skipped = 0
