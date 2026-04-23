@@ -1060,6 +1060,7 @@ $form.Controls.AddRange(@(
 
 Refresh-History
 Update-ProtectionButton
+Update-StoreButtonLabel
 $form.ShowDialog() | Out-Null
 '@
 
