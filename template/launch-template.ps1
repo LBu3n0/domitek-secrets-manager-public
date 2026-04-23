@@ -30,8 +30,14 @@ Write-Host ""
 Write-Host "Domitek Secrets Manager" -ForegroundColor White
 Write-Host "-----------------------------------------" -ForegroundColor DarkGray
 Write-Host "Project: $PROJECT_NAME" -ForegroundColor Cyan
-Write-Host "Loading secrets from Windows Credential Manager..." -ForegroundColor Gray
-Write-Host ""
+if ($KEYS.Count -gt 0) {
+    Write-Host "Loading secrets from Windows Credential Manager..." -ForegroundColor Gray
+    Write-Host ""
+} else {
+    Write-Host "No vault secrets configured for this project." -ForegroundColor Gray
+    Write-Host "Claude Code will launch with protection layer only." -ForegroundColor Gray
+    Write-Host ""
+}
 
 $missing = @()
 foreach ($key in $KEYS) {
@@ -62,23 +68,33 @@ if ($missing.Count -gt 0) {
     Write-Host ""
 }
 
-Write-Host "All available secrets loaded into session memory." -ForegroundColor Green
-Write-Host "Nothing written to disk." -ForegroundColor Gray
-Write-Host "Secrets expire when this terminal session closes." -ForegroundColor Gray
-Write-Host ""
+# Only claim secrets are loaded when we actually loaded some.
+if ($KEYS.Count -gt 0) {
+    Write-Host "All available secrets loaded into session memory." -ForegroundColor Green
+    Write-Host "Nothing written to disk." -ForegroundColor Gray
+    Write-Host "Secrets expire when this terminal session closes." -ForegroundColor Gray
+    Write-Host ""
+}
 
 $claudeMd = Join-Path $PSScriptRoot "CLAUDE.md"
 $keysLoaded = $KEYS | Where-Object { $_ -notin $missing }
 $claudeLines = @()
 $claudeLines += "# Domitek Secrets -- Project: $PROJECT_NAME"
 $claudeLines += ""
-$claudeLines += "## Environment Variables"
-$claudeLines += "All secrets are injected at startup via Windows Credential Manager."
-$claudeLines += "Available as environment variables. Use the exact names listed below with process.env."
-$claudeLines += ""
-$claudeLines += "### Available variables this session:"
-foreach ($k in $keysLoaded) { $claudeLines += ("- " + $k) }
-$claudeLines += ""
+if ($KEYS.Count -gt 0) {
+    $claudeLines += "## Environment Variables"
+    $claudeLines += "All secrets are injected at startup via Windows Credential Manager."
+    $claudeLines += "Available as environment variables. Use the exact names listed below with process.env."
+    $claudeLines += ""
+    $claudeLines += "### Available variables this session:"
+    foreach ($k in $keysLoaded) { $claudeLines += ("- " + $k) }
+    $claudeLines += ""
+} else {
+    $claudeLines += "## Environment Variables"
+    $claudeLines += "No vault secrets are configured for this project."
+    $claudeLines += "If this project needs API keys or credentials later, open Domitek Secrets Manager and store them."
+    $claudeLines += ""
+}
 $claudeLines += "## IMPORTANT RULES"
 $claudeLines += "1. Never create .env or .env.local files -- secrets come from the vault"
 $claudeLines += "2. Never hardcode API keys or URLs -- always use process.env.VARIABLE_NAME"

@@ -678,43 +678,49 @@ $btnStore.Add_Click({
     Refresh-History
     Update-DaysLabels $projectName
 
-    if ($keys.Count -gt 0) {
-        if ($null -eq $projectPath) {
-            $dlg = New-Object System.Windows.Forms.FolderBrowserDialog
-            $dlg.Description = "Select project folder to save launch-claude.ps1"
-            if ($dlg.ShowDialog() -eq "OK") { $projectPath = $dlg.SelectedPath }
-        }
+    # Zero-keys projects ARE valid -- user may be using claude.ai Max
+    # subscription with no API keys and still wants DSM's protection
+    # layer (deny rules, CLAUDE.md reminders, no-.env enforcement).
+    # So we prompt for a folder and generate launch-claude.ps1 even
+    # when there are no keys to store. The generated script handles
+    # the zero-keys case gracefully inside launch-template.ps1.
+    if ($null -eq $projectPath) {
+        $dlg = New-Object System.Windows.Forms.FolderBrowserDialog
+        $dlg.Description = "Select project folder to save launch-claude.ps1"
+        if ($dlg.ShowDialog() -eq "OK") { $projectPath = $dlg.SelectedPath }
+    }
 
-        if ($null -ne $projectPath) {
-            $nextPub = $nextPublicKeys
-            if (Generate-LaunchScript $projectPath $projectName $keys $nextPub) {
-                # Update config.json so DomitekLaunch.ps1 menu reflects
-                # the project the user just configured. Without this, menu
-                # [2] Launch Claude Code would still point to whichever
-                # project setup.ps1 originally configured.
-                $cfgOK = Save-Config $projectName $projectPath
-                # Status message is HONEST about what happened based on
-                # actual stored count. "Stored 0 secrets + generated script"
-                # is misleading -- if nothing was stored, say so.
-                if ($stored -gt 0) {
-                    $msg = "Stored $stored secret(s) + generated launch-claude.ps1 in $projectPath"
-                } else {
-                    $msg = "Generated launch-claude.ps1 in $projectPath. No values provided -- vault unchanged."
-                }
-                if ($cfgOK) {
-                    Set-Status $msg ([System.Drawing.Color]::FromArgb(0, 150, 80))
-                } else {
-                    Set-Status "$msg [WARN] config.json not updated -- menu may still show previous project." ([System.Drawing.Color]::FromArgb(180, 120, 0))
-                }
-                return
+    if ($null -ne $projectPath) {
+        $nextPub = $nextPublicKeys
+        if (Generate-LaunchScript $projectPath $projectName $keys $nextPub) {
+            # Update config.json so DomitekLaunch.ps1 menu reflects
+            # the project the user just configured. Without this, menu
+            # [2] Launch Claude Code would still point to whichever
+            # project setup.ps1 originally configured.
+            $cfgOK = Save-Config $projectName $projectPath
+            # Status message is HONEST about what happened based on
+            # actual stored count AND whether any keys exist for this project.
+            if ($stored -gt 0) {
+                $msg = "Stored $stored secret(s) + generated launch-claude.ps1 in $projectPath"
+            } elseif ($keys.Count -gt 0) {
+                $msg = "Generated launch-claude.ps1 in $projectPath. No values provided -- vault unchanged."
+            } else {
+                $msg = "Generated launch-claude.ps1 in $projectPath. Zero-keys project -- Claude Code will launch with protection layer only."
             }
+            if ($cfgOK) {
+                Set-Status $msg ([System.Drawing.Color]::FromArgb(0, 150, 80))
+            } else {
+                Set-Status "$msg [WARN] config.json not updated -- menu may still show previous project." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+            }
+            return
         }
     }
 
+    # Fallback: project path was null AND user cancelled the folder picker.
     if ($stored -gt 0) {
         Set-Status "Stored $stored secret(s) for [$projectName]. Values cleared." ([System.Drawing.Color]::FromArgb(0, 150, 80))
     } else {
-        Set-Status "No values provided -- nothing stored. Enter secret values first." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+        Set-Status "Nothing happened -- select a project folder to generate launch-claude.ps1." ([System.Drawing.Color]::FromArgb(180, 120, 0))
     }
 })
 
@@ -787,12 +793,17 @@ function Test-AndRegenerate {
         if ($t -like "${projectName}_*") { $t -replace "^${projectName}_", "" }
     } | Where-Object { $_ }
     if ($keys.Count -eq 0) {
-        Set-Status "No vault keys found for $projectName. Store secrets first." ([System.Drawing.Color]::Red)
-        return $false
+        # Zero-keys project: still regenerate the script. Claude Code
+        # will launch with the protection layer (deny rules, CLAUDE.md
+        # reminders) but no vault injection. Warning is visible in the
+        # status bar but does NOT block the launch.
+        Set-Status "No vault keys for $projectName. Launching with protection layer only." ([System.Drawing.Color]::FromArgb(180, 120, 0))
     }
     $nextPublicKeys = $keys | Where-Object { $_ -match "URL|ANON|WEBHOOK_URL|WEBHOOK_SECRET" }
     if (Generate-LaunchScript $projectPath $projectName $keys $nextPublicKeys) {
-        Set-Status "launch-claude.ps1 updated to v1.5." ([System.Drawing.Color]::FromArgb(0, 130, 70))
+        if ($keys.Count -gt 0) {
+            Set-Status "launch-claude.ps1 updated to v1.5." ([System.Drawing.Color]::FromArgb(0, 130, 70))
+        }
         return $true
     }
     return $false
