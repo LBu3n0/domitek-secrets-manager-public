@@ -573,15 +573,19 @@ $lblSub.Size          = New-Object System.Drawing.Size(390, 18)
 
 $pnlHeader.Controls.AddRange(@($lblVersion, $lblSub))
 
-# -- Theme toggle button (sits in header banner, top-right below version) --
+# -- Theme toggle button (sits in header banner, top-right) --
+# Header banner stays WHITE in both themes (per design), so this
+# button uses always-dark colors regardless of active theme.
 $btnTheme              = New-Object System.Windows.Forms.Button
 $btnTheme.Text         = "Dark"
-$btnTheme.Font         = New-Object System.Drawing.Font("Segoe UI", 8)
-$btnTheme.Location     = New-Object System.Drawing.Point(545, 32)
-$btnTheme.Size         = New-Object System.Drawing.Size(60, 22)
+$btnTheme.Font         = New-Object System.Drawing.Font("Segoe UI", 8, [System.Drawing.FontStyle]::Bold)
+$btnTheme.Location     = New-Object System.Drawing.Point(530, 30)
+$btnTheme.Size         = New-Object System.Drawing.Size(75, 22)
 $btnTheme.FlatStyle    = "Flat"
 $btnTheme.BackColor    = [System.Drawing.Color]::White
-$btnTheme.FlatAppearance.BorderSize = 1
+$btnTheme.ForeColor    = [System.Drawing.Color]::FromArgb(30, 30, 50)
+$btnTheme.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(30, 30, 50)
+$btnTheme.FlatAppearance.BorderSize  = 1
 $btnTheme.Cursor       = [System.Windows.Forms.Cursors]::Hand
 $btnTheme.Add_Click({
     if ($script:THEME -eq "dark") {
@@ -595,6 +599,7 @@ $btnTheme.Add_Click({
     Apply-Theme
 })
 $pnlHeader.Controls.Add($btnTheme)
+$btnTheme.BringToFront()
 
 # -- Divider separating header banner from form content --
 $lblHeaderDivider           = New-Object System.Windows.Forms.Label
@@ -1503,15 +1508,15 @@ function Apply-Theme {
     $lblStatus.ForeColor    = $p.StatusDefault
     $lblCopyright.ForeColor = $p.Footer
 
-    # Theme toggle button glyph
+    # Theme toggle button: only update label text. Colors stay
+    # always-dark since the header banner is always white in both
+    # themes.
     if ($null -ne $btnTheme) {
         if ($script:THEME -eq "dark") {
             $btnTheme.Text = "Light"
         } else {
             $btnTheme.Text = "Dark"
         }
-        $btnTheme.ForeColor = $p.Icon
-        $btnTheme.FlatAppearance.BorderColor = $p.Icon
     }
 
     # Protection banner reflects current state in current theme
