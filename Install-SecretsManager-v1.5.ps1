@@ -37,7 +37,7 @@ $FORM_WIDTH     = 620
 # Two named palettes. Set-Theme reads the chosen palette and applies
 # colors to all controls. Light is the default per user request.
 $LIGHT_PALETTE = @{
-    Form               = [System.Drawing.Color]::White
+    Form               = [System.Drawing.Color]::FromArgb(245, 245, 245)
     PanelBg            = [System.Drawing.Color]::White
     InputBg            = [System.Drawing.Color]::White
     SecretsRowInputBg  = [System.Drawing.Color]::White
