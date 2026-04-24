@@ -195,8 +195,12 @@ function Load-VaultKeys {
         $t = ($_ -replace ".*target=", "" -replace "\s.*", "").Trim()
         if ($t -like "${projName}_*") { $t -replace "^${projName}_", "" }
     } | Where-Object { $_ }
+    # Always clear stale rows from a previously-loaded project.
+    # Previously this only ran when keys.Count -gt 0, which left the form
+    # showing the old project's rows (and the status bar its old message)
+    # whenever the user switched to a project that had no vault keys yet.
+    Clear-SecretRows
     if ($keys.Count -gt 0) {
-        Clear-SecretRows
         $rot = Load-Rotation
         foreach ($k in $keys) {
             $entry = $rot["${projName}_${k}"]
@@ -218,7 +222,19 @@ function Load-VaultKeys {
             Add-SecretRow $k $rotDays
         }
         Set-Status "Loaded $($keys.Count) key(s) from vault for: $projName" ([System.Drawing.Color]::FromArgb(0, 100, 180))
+    } else {
+        # Project has no vault keys yet -- repopulate with the current
+        # project type's template defaults (KEY NAMEs only, no VALUEs)
+        # so the user can either fill in values to store OR click
+        # Generate Script for a zero-keys project.
+        $typeName = $cboType.SelectedItem
+        if ($null -ne $typeName -and $projectTypes.ContainsKey($typeName)) {
+            foreach ($k in $projectTypes[$typeName]) { Add-SecretRow $k }
+        }
+        Set-Status "No vault keys for '$projName'. Enter values to store or click Generate Script for a zero-keys project." ([System.Drawing.Color]::FromArgb(180, 120, 0))
     }
+    # Sync the dynamic button label since we just changed the row set.
+    Update-StoreButtonLabel
 }
 
 function Refresh-EnvPath {
