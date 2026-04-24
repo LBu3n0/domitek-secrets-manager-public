@@ -459,6 +459,14 @@ $lblSub.Size          = New-Object System.Drawing.Size(390, 18)
 
 $pnlHeader.Controls.AddRange(@($lblVersion, $lblSub))
 
+# -- Divider separating header banner from form content --
+$lblHeaderDivider           = New-Object System.Windows.Forms.Label
+$lblHeaderDivider.Text      = ""
+$lblHeaderDivider.BorderStyle = "FixedSingle"
+$lblHeaderDivider.BackColor = [System.Drawing.Color]::FromArgb(120, 120, 130)
+$lblHeaderDivider.Location  = New-Object System.Drawing.Point(0, 76)
+$lblHeaderDivider.Size      = New-Object System.Drawing.Size(620, 1)
+
 # -- Project Name + Browse ------------------------------------------
 $lblProj          = New-Object System.Windows.Forms.Label
 $lblProj.Text     = "Project Name"
@@ -470,7 +478,8 @@ $txtProject           = New-Object System.Windows.Forms.TextBox
 $txtProject.Font      = New-Object System.Drawing.Font("Segoe UI", 10)
 $txtProject.Location  = New-Object System.Drawing.Point(15, 108)
 $txtProject.Size      = New-Object System.Drawing.Size(490, 26)
-$txtProject.BorderStyle = "FixedSingle"
+$txtProject.BorderStyle = "Fixed3D"
+$txtProject.BackColor = [System.Drawing.Color]::White
 
 $btnBrowse            = New-Object System.Windows.Forms.Button
 $btnBrowse.Text       = "Browse..."
@@ -628,6 +637,7 @@ $cboType.Location     = New-Object System.Drawing.Point(15, 260)
 $cboType.Size         = New-Object System.Drawing.Size(588, 26)
 $cboType.DropDownStyle= "DropDownList"
 $cboType.FlatStyle    = "Standard"
+$cboType.BackColor    = [System.Drawing.Color]::White
 $cboType.Items.AddRange(@("Claude Code Assistant", "Claude Code Application"))
 $cboType.SelectedIndex = 0
 $cboType.Add_SelectedIndexChanged({ Load-ProjectType $cboType.SelectedItem })
@@ -702,8 +712,8 @@ $btnClear.Location  = New-Object System.Drawing.Point(148, 568)
 $btnClear.Size      = New-Object System.Drawing.Size(110, 28)
 $btnClear.FlatStyle = "Flat"
 $btnClear.BackColor = [System.Drawing.Color]::White
-$btnClear.ForeColor = [System.Drawing.Color]::FromArgb(90, 90, 110)
-$btnClear.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(200, 200, 210)
+$btnClear.ForeColor = [System.Drawing.Color]::FromArgb(214, 56, 56)
+$btnClear.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(214, 56, 56)
 $btnClear.FlatAppearance.BorderSize  = 1
 $btnClear.Add_Click({
     foreach ($row in $secretRows) {
@@ -1209,6 +1219,7 @@ $lblCopyright.TextAlign = "MiddleCenter"
 # -- Wire everything up ---------------------------------------------
 $form.Controls.AddRange(@(
     $pnlHeader,
+    $lblHeaderDivider,
     $lblProj, $txtProject, $btnBrowse, $lblProjHint,
     $lblRecent, $cboHistory, $btnPruneMissing, $btnClearHistory, $lblSectionDivider1,
     $lblType, $cboType, $lblTypeHint,
