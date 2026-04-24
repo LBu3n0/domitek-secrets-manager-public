@@ -101,10 +101,10 @@ function Get-DaysRemaining {
 
 function Get-RotationColor {
     param($days)
-    if ($null -eq $days) { return [System.Drawing.Color]::Gray }
-    if ($days -gt 30)    { return [System.Drawing.Color]::FromArgb(0, 150, 80) }
-    if ($days -gt 0)     { return [System.Drawing.Color]::FromArgb(200, 140, 0) }
-    return [System.Drawing.Color]::FromArgb(200, 40, 40)
+    if ($null -eq $days) { return [System.Drawing.Color]::FromArgb(160, 160, 175) }
+    if ($days -gt 30)    { return [System.Drawing.Color]::FromArgb(16, 185, 129) }
+    if ($days -gt 0)     { return [System.Drawing.Color]::FromArgb(240, 180, 60) }
+    return [System.Drawing.Color]::FromArgb(240, 80, 80)
 }
 
 # -- History helpers ------------------------------------------------
@@ -221,7 +221,7 @@ function Load-VaultKeys {
             }
             Add-SecretRow $k $rotDays
         }
-        Set-Status "Loaded $($keys.Count) key(s) from vault for: $projName" ([System.Drawing.Color]::FromArgb(0, 100, 180))
+        Set-Status "Loaded $($keys.Count) key(s) from vault for: $projName" ([System.Drawing.Color]::FromArgb(70, 150, 240))
     } else {
         # Project has no vault keys yet -- repopulate with the current
         # project type's template defaults (KEY NAMEs only, no VALUEs)
@@ -231,7 +231,7 @@ function Load-VaultKeys {
         if ($null -ne $typeName -and $projectTypes.ContainsKey($typeName)) {
             foreach ($k in $projectTypes[$typeName]) { Add-SecretRow $k }
         }
-        Set-Status "No vault keys for '$projName'. Enter values to store or click Generate Script for a zero-keys project." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+        Set-Status "No vault keys for '$projName'. Enter values to store or click Generate Script for a zero-keys project." ([System.Drawing.Color]::FromArgb(240, 180, 60))
     }
     # Sync the dynamic button label since we just changed the row set.
     Update-StoreButtonLabel
@@ -302,6 +302,8 @@ function Add-SecretRow {
     $txtName.Size        = New-Object System.Drawing.Size(185, 24)
     $txtName.Text        = $defaultName
     $txtName.BorderStyle = "FixedSingle"
+    $txtName.BackColor   = [System.Drawing.Color]::FromArgb(30, 30, 36)
+    $txtName.ForeColor   = [System.Drawing.Color]::White
 
     $txtValue              = New-Object System.Windows.Forms.TextBox
     $txtValue.Font         = New-Object System.Drawing.Font("Segoe UI", 9)
@@ -309,6 +311,8 @@ function Add-SecretRow {
     $txtValue.Size         = New-Object System.Drawing.Size(185, 24)
     $txtValue.PasswordChar = [char]0x25CF
     $txtValue.BorderStyle  = "FixedSingle"
+    $txtValue.BackColor    = [System.Drawing.Color]::FromArgb(30, 30, 36)
+    $txtValue.ForeColor    = [System.Drawing.Color]::White
     # Fire label refresh whenever the value field changes. The button label
     # at the bottom of the form reads "Generate Script" when all values are
     # empty, "Store to Vault + Generate Script" when any value has content.
@@ -319,7 +323,9 @@ function Add-SecretRow {
     $cboRotation.Location     = New-Object System.Drawing.Point(391, $script:currentY)
     $cboRotation.Size         = New-Object System.Drawing.Size(90, 24)
     $cboRotation.DropDownStyle= "DropDownList"
-    $cboRotation.FlatStyle    = "Flat"
+    $cboRotation.FlatStyle    = "Standard"
+    $cboRotation.BackColor    = [System.Drawing.Color]::FromArgb(30, 30, 36)
+    $cboRotation.ForeColor    = [System.Drawing.Color]::White
     $cboRotation.Items.AddRange(@("30 days","90 days","180 days","Never"))
     $cboRotation.SelectedItem = switch ($rotationDays) {
         "30"    { "30 days" }
@@ -334,7 +340,8 @@ function Add-SecretRow {
     $lblDays.Location     = New-Object System.Drawing.Point(488, $daysY)
     $lblDays.Size         = New-Object System.Drawing.Size(95, 18)
     $lblDays.Text         = ""
-    $lblDays.ForeColor    = [System.Drawing.Color]::Gray
+    $lblDays.ForeColor    = [System.Drawing.Color]::FromArgb(160, 160, 175)
+    $lblDays.BackColor    = [System.Drawing.Color]::FromArgb(42, 42, 50)
 
     $pnlSecrets.Controls.AddRange(@($txtName, $txtValue, $cboRotation, $lblDays))
     $secretRows.Add(@{ Name = $txtName; Value = $txtValue; Rotation = $cboRotation; Days = $lblDays }) | Out-Null
@@ -355,10 +362,10 @@ function Update-DaysLabels {
             $row.Days.Text = ""
         } elseif ($days -eq 9999) {
             $row.Days.Text = "No expiry"
-            $row.Days.ForeColor = [System.Drawing.Color]::Gray
+            $row.Days.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
         } elseif ($days -lt 0) {
             $row.Days.Text = "OVERDUE"
-            $row.Days.ForeColor = [System.Drawing.Color]::FromArgb(200, 40, 40)
+            $row.Days.ForeColor = [System.Drawing.Color]::FromArgb(240, 80, 80)
         } else {
             $row.Days.Text = "$days days left"
             $row.Days.ForeColor = Get-RotationColor $days
@@ -372,7 +379,7 @@ function Load-ProjectType {
     foreach ($k in $projectTypes[$typeName]) { Add-SecretRow $k }
     if ($typeName -eq "Claude Code Assistant") {
         $lblTypeHint.Text      = "Launches Claude Code using claude.ai Max subscription. No Anthropic API key needed."
-        $lblTypeHint.ForeColor = [System.Drawing.Color]::FromArgb(0, 130, 70)
+        $lblTypeHint.ForeColor = [System.Drawing.Color]::FromArgb(16, 185, 129)
     } else {
         $lblTypeHint.Text      = "Runs your application with Anthropic API billing. Injects API key into app process."
         $lblTypeHint.ForeColor = [System.Drawing.Color]::FromArgb(26, 95, 170)
@@ -392,7 +399,8 @@ $form.ClientSize       = New-Object System.Drawing.Size(620, 944)
 $form.StartPosition    = "CenterScreen"
 $form.FormBorderStyle  = "FixedSingle"
 $form.MaximizeBox      = $false
-$form.BackColor        = [System.Drawing.Color]::White
+$form.BackColor        = [System.Drawing.Color]::FromArgb(30, 30, 36)
+$form.ForeColor        = [System.Drawing.Color]::White
 
 # Set form icon if available
 if (-not [string]::IsNullOrEmpty($LOGO_BASE64_EMBEDDED)) {
@@ -463,7 +471,7 @@ $pnlHeader.Controls.AddRange(@($lblVersion, $lblSub))
 $lblHeaderDivider           = New-Object System.Windows.Forms.Label
 $lblHeaderDivider.Text      = ""
 $lblHeaderDivider.BorderStyle = "FixedSingle"
-$lblHeaderDivider.BackColor = [System.Drawing.Color]::FromArgb(120, 120, 130)
+$lblHeaderDivider.BackColor = [System.Drawing.Color]::FromArgb(62, 62, 72)
 $lblHeaderDivider.Location  = New-Object System.Drawing.Point(0, 76)
 $lblHeaderDivider.Size      = New-Object System.Drawing.Size(620, 1)
 
@@ -471,6 +479,7 @@ $lblHeaderDivider.Size      = New-Object System.Drawing.Size(620, 1)
 $lblProj          = New-Object System.Windows.Forms.Label
 $lblProj.Text     = "Project Name"
 $lblProj.Font     = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
+$lblProj.ForeColor = [System.Drawing.Color]::White
 $lblProj.Location = New-Object System.Drawing.Point(15, 88)
 $lblProj.Size     = New-Object System.Drawing.Size(580, 22)
 
@@ -479,7 +488,8 @@ $txtProject.Font      = New-Object System.Drawing.Font("Segoe UI", 10)
 $txtProject.Location  = New-Object System.Drawing.Point(15, 115)
 $txtProject.Size      = New-Object System.Drawing.Size(490, 26)
 $txtProject.BorderStyle = "Fixed3D"
-$txtProject.BackColor = [System.Drawing.Color]::White
+$txtProject.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$txtProject.ForeColor = [System.Drawing.Color]::White
 
 $btnBrowse            = New-Object System.Windows.Forms.Button
 $btnBrowse.Text       = "Browse..."
@@ -487,7 +497,10 @@ $btnBrowse.Font       = New-Object System.Drawing.Font("Segoe UI", 9)
 $btnBrowse.Location   = New-Object System.Drawing.Point(515, 114)
 $btnBrowse.Size       = New-Object System.Drawing.Size(88, 28)
 $btnBrowse.FlatStyle  = "Flat"
-$btnBrowse.BackColor  = [System.Drawing.Color]::White
+$btnBrowse.BackColor  = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnBrowse.ForeColor  = [System.Drawing.Color]::White
+$btnBrowse.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
+$btnBrowse.FlatAppearance.BorderSize  = 1
 $btnBrowse.Add_Click({
     $dlg = New-Object System.Windows.Forms.FolderBrowserDialog
     $dlg.Description         = "Select your project folder"
@@ -504,14 +517,14 @@ $btnBrowse.Add_Click({
         Refresh-History
         Load-VaultKeys $dlg.SelectedPath
         Update-DaysLabels $dlg.SelectedPath
-        Set-Status "Folder selected. Vault keys will use prefix: ${cleanName}_KEYNAME" ([System.Drawing.Color]::FromArgb(0, 100, 180))
+        Set-Status "Folder selected. Vault keys will use prefix: ${cleanName}_KEYNAME" ([System.Drawing.Color]::FromArgb(70, 150, 240))
     }
 })
 
 $lblProjHint          = New-Object System.Windows.Forms.Label
 $lblProjHint.Text     = "Type a name (e.g. envproject) or browse to your project folder"
 $lblProjHint.Font     = New-Object System.Drawing.Font("Segoe UI", 8)
-$lblProjHint.ForeColor= [System.Drawing.Color]::FromArgb(90, 90, 110)
+$lblProjHint.ForeColor= [System.Drawing.Color]::FromArgb(160, 160, 175)
 $lblProjHint.Location = New-Object System.Drawing.Point(15, 145)
 $lblProjHint.Size     = New-Object System.Drawing.Size(580, 16)
 
@@ -519,7 +532,7 @@ $lblProjHint.Size     = New-Object System.Drawing.Size(580, 16)
 $lblRecent            = New-Object System.Windows.Forms.Label
 $lblRecent.Text       = "Recent projects"
 $lblRecent.Font       = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
-$lblRecent.ForeColor  = [System.Drawing.Color]::FromArgb(30, 30, 50)
+$lblRecent.ForeColor  = [System.Drawing.Color]::White
 $lblRecent.Location   = New-Object System.Drawing.Point(15, 155)
 $lblRecent.Size       = New-Object System.Drawing.Size(200, 22)
 
@@ -529,7 +542,8 @@ $cboHistory.Location      = New-Object System.Drawing.Point(15, 183)
 $cboHistory.Size          = New-Object System.Drawing.Size(588, 24)
 $cboHistory.DropDownStyle = "DropDownList"
 $cboHistory.FlatStyle     = "Standard"
-$cboHistory.BackColor     = [System.Drawing.Color]::White
+$cboHistory.BackColor     = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$cboHistory.ForeColor     = [System.Drawing.Color]::White
 $cboHistory.Add_SelectedIndexChanged({
     if ($cboHistory.SelectedItem) {
         $txtProject.Text = $cboHistory.SelectedItem.ToString()
@@ -545,9 +559,9 @@ $btnPruneMissing.Font      = New-Object System.Drawing.Font("Segoe UI", 8)
 $btnPruneMissing.Location  = New-Object System.Drawing.Point(409, 213)
 $btnPruneMissing.Size      = New-Object System.Drawing.Size(90, 22)
 $btnPruneMissing.FlatStyle = "Flat"
-$btnPruneMissing.BackColor = [System.Drawing.Color]::White
-$btnPruneMissing.ForeColor = [System.Drawing.Color]::FromArgb(0, 90, 158)
-$btnPruneMissing.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 90, 158)
+$btnPruneMissing.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnPruneMissing.ForeColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
+$btnPruneMissing.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
 $btnPruneMissing.FlatAppearance.BorderSize  = 1
 $btnPruneMissing.Add_Click({
     # Read history, keep entries whose folders still exist, drop the rest.
@@ -556,7 +570,7 @@ $btnPruneMissing.Add_Click({
     # the base path.
     $existing = Load-History
     if ($null -eq $existing -or $existing.Count -eq 0) {
-        Set-Status "History is already empty -- nothing to prune." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+        Set-Status "History is already empty -- nothing to prune." ([System.Drawing.Color]::FromArgb(240, 180, 60))
         return
     }
     $kept    = [System.Collections.ArrayList]@()
@@ -574,7 +588,7 @@ $btnPruneMissing.Add_Click({
         }
     }
     if ($dropped -eq 0) {
-        Set-Status "All history entries point at existing folders -- nothing to prune." ([System.Drawing.Color]::FromArgb(0, 100, 180))
+        Set-Status "All history entries point at existing folders -- nothing to prune." ([System.Drawing.Color]::FromArgb(70, 150, 240))
         return
     }
     # Write the kept list back to history.
@@ -582,7 +596,7 @@ $btnPruneMissing.Add_Click({
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
     $kept | ConvertTo-Json | Out-File $HISTORY_FILE -Encoding UTF8
     Refresh-History
-    Set-Status "Pruned $dropped missing folder(s) from history. $($kept.Count) entries remain." ([System.Drawing.Color]::FromArgb(0, 130, 70))
+    Set-Status "Pruned $dropped missing folder(s) from history. $($kept.Count) entries remain." ([System.Drawing.Color]::FromArgb(16, 185, 129))
 })
 
 $btnClearHistory           = New-Object System.Windows.Forms.Button
@@ -591,9 +605,9 @@ $btnClearHistory.Font      = New-Object System.Drawing.Font("Segoe UI", 8)
 $btnClearHistory.Location  = New-Object System.Drawing.Point(513, 213)
 $btnClearHistory.Size      = New-Object System.Drawing.Size(90, 22)
 $btnClearHistory.FlatStyle = "Flat"
-$btnClearHistory.BackColor = [System.Drawing.Color]::White
-$btnClearHistory.ForeColor = [System.Drawing.Color]::FromArgb(214, 56, 56)
-$btnClearHistory.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(214, 56, 56)
+$btnClearHistory.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnClearHistory.ForeColor = [System.Drawing.Color]::FromArgb(240, 80, 80)
+$btnClearHistory.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(240, 80, 80)
 $btnClearHistory.FlatAppearance.BorderSize  = 1
 $btnClearHistory.Add_Click({
     # Destructive -- confirm before wiping.
@@ -613,14 +627,14 @@ $btnClearHistory.Add_Click({
         }
     }
     Refresh-History
-    Set-Status "Recent projects history cleared." ([System.Drawing.Color]::FromArgb(0, 130, 70))
+    Set-Status "Recent projects history cleared." ([System.Drawing.Color]::FromArgb(16, 185, 129))
 })
 
 # -- Visual divider between Recent Projects and Project Type sections --
 $lblSectionDivider1           = New-Object System.Windows.Forms.Label
 $lblSectionDivider1.Text      = ""
 $lblSectionDivider1.BorderStyle = "FixedSingle"
-$lblSectionDivider1.BackColor = [System.Drawing.Color]::FromArgb(220, 220, 230)
+$lblSectionDivider1.BackColor = [System.Drawing.Color]::FromArgb(62, 62, 72)
 $lblSectionDivider1.Location  = New-Object System.Drawing.Point(15, 240)
 $lblSectionDivider1.Size      = New-Object System.Drawing.Size(588, 1)
 
@@ -628,6 +642,7 @@ $lblSectionDivider1.Size      = New-Object System.Drawing.Size(588, 1)
 $lblType          = New-Object System.Windows.Forms.Label
 $lblType.Text     = "Project Type"
 $lblType.Font     = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
+$lblType.ForeColor = [System.Drawing.Color]::White
 $lblType.Location = New-Object System.Drawing.Point(15, 250)
 $lblType.Size     = New-Object System.Drawing.Size(580, 22)
 
@@ -637,7 +652,8 @@ $cboType.Location     = New-Object System.Drawing.Point(15, 277)
 $cboType.Size         = New-Object System.Drawing.Size(588, 26)
 $cboType.DropDownStyle= "DropDownList"
 $cboType.FlatStyle    = "Standard"
-$cboType.BackColor    = [System.Drawing.Color]::White
+$cboType.BackColor    = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$cboType.ForeColor    = [System.Drawing.Color]::White
 $cboType.Items.AddRange(@("Claude Code Assistant", "Claude Code Application"))
 $cboType.SelectedIndex = 0
 $cboType.Add_SelectedIndexChanged({ Load-ProjectType $cboType.SelectedItem })
@@ -652,34 +668,35 @@ $lblTypeHint.AutoSize = $false
 $lblSecrets          = New-Object System.Windows.Forms.Label
 $lblSecrets.Text     = "Secrets"
 $lblSecrets.Font     = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
+$lblSecrets.ForeColor = [System.Drawing.Color]::White
 $lblSecrets.Location = New-Object System.Drawing.Point(15, 342)
 $lblSecrets.Size     = New-Object System.Drawing.Size(100, 22)
 
 $lblColKey           = New-Object System.Windows.Forms.Label
 $lblColKey.Text      = "KEY NAME"
 $lblColKey.Font      = New-Object System.Drawing.Font("Segoe UI", 7, [System.Drawing.FontStyle]::Bold)
-$lblColKey.ForeColor = [System.Drawing.Color]::Gray
+$lblColKey.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
 $lblColKey.Location  = New-Object System.Drawing.Point(20, 364)
 $lblColKey.Size      = New-Object System.Drawing.Size(180, 14)
 
 $lblColVal           = New-Object System.Windows.Forms.Label
 $lblColVal.Text      = "SECRET VALUE"
 $lblColVal.Font      = New-Object System.Drawing.Font("Segoe UI", 7, [System.Drawing.FontStyle]::Bold)
-$lblColVal.ForeColor = [System.Drawing.Color]::Gray
+$lblColVal.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
 $lblColVal.Location  = New-Object System.Drawing.Point(210, 364)
 $lblColVal.Size      = New-Object System.Drawing.Size(175, 14)
 
 $lblColRot           = New-Object System.Windows.Forms.Label
 $lblColRot.Text      = "ROTATE"
 $lblColRot.Font      = New-Object System.Drawing.Font("Segoe UI", 7, [System.Drawing.FontStyle]::Bold)
-$lblColRot.ForeColor = [System.Drawing.Color]::Gray
+$lblColRot.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
 $lblColRot.Location  = New-Object System.Drawing.Point(398, 364)
 $lblColRot.Size      = New-Object System.Drawing.Size(80, 14)
 
 $lblColDays          = New-Object System.Windows.Forms.Label
 $lblColDays.Text     = "STATUS"
 $lblColDays.Font     = New-Object System.Drawing.Font("Segoe UI", 7, [System.Drawing.FontStyle]::Bold)
-$lblColDays.ForeColor = [System.Drawing.Color]::Gray
+$lblColDays.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
 $lblColDays.Location  = New-Object System.Drawing.Point(488, 364)
 $lblColDays.Size      = New-Object System.Drawing.Size(100, 14)
 
@@ -688,7 +705,7 @@ $pnlSecrets.Location     = New-Object System.Drawing.Point(15, 380)
 $pnlSecrets.Size         = New-Object System.Drawing.Size(588, 190)
 $pnlSecrets.AutoScroll   = $true
 $pnlSecrets.BorderStyle  = "FixedSingle"
-$pnlSecrets.BackColor    = [System.Drawing.Color]::White
+$pnlSecrets.BackColor    = [System.Drawing.Color]::FromArgb(42, 42, 50)
 
 Load-ProjectType "Claude Code Assistant"
 
@@ -699,9 +716,9 @@ $btnAdd.Font      = New-Object System.Drawing.Font("Segoe UI", 9)
 $btnAdd.Location  = New-Object System.Drawing.Point(15, 580)
 $btnAdd.Size      = New-Object System.Drawing.Size(120, 28)
 $btnAdd.FlatStyle = "Flat"
-$btnAdd.BackColor = [System.Drawing.Color]::White
-$btnAdd.ForeColor = [System.Drawing.Color]::FromArgb(0, 90, 158)
-$btnAdd.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 90, 158)
+$btnAdd.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnAdd.ForeColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
+$btnAdd.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
 $btnAdd.FlatAppearance.BorderSize  = 1
 $btnAdd.Add_Click({ Add-SecretRow "" })
 
@@ -711,9 +728,9 @@ $btnClear.Font      = New-Object System.Drawing.Font("Segoe UI", 9)
 $btnClear.Location  = New-Object System.Drawing.Point(148, 580)
 $btnClear.Size      = New-Object System.Drawing.Size(110, 28)
 $btnClear.FlatStyle = "Flat"
-$btnClear.BackColor = [System.Drawing.Color]::White
-$btnClear.ForeColor = [System.Drawing.Color]::FromArgb(214, 56, 56)
-$btnClear.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(214, 56, 56)
+$btnClear.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnClear.ForeColor = [System.Drawing.Color]::FromArgb(240, 80, 80)
+$btnClear.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(240, 80, 80)
 $btnClear.FlatAppearance.BorderSize  = 1
 $btnClear.Add_Click({
     foreach ($row in $secretRows) {
@@ -729,20 +746,21 @@ $btnViewVault.Font      = New-Object System.Drawing.Font("Segoe UI", 9)
 $btnViewVault.Location  = New-Object System.Drawing.Point(267, 580)
 $btnViewVault.Size      = New-Object System.Drawing.Size(100, 28)
 $btnViewVault.FlatStyle = "Flat"
-$btnViewVault.BackColor = [System.Drawing.Color]::FromArgb(0, 90, 158)
+$btnViewVault.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnViewVault.ForeColor = [System.Drawing.Color]::White
 $btnViewVault.FlatAppearance.BorderSize = 0
 $btnViewVault.Add_Click({
     Start-Process "rundll32.exe" -ArgumentList "keymgr.dll, KRShowKeyMgr"
-    Set-Status "Windows Credential Manager opened." ([System.Drawing.Color]::FromArgb(0, 90, 158))
+    Set-Status "Windows Credential Manager opened." ([System.Drawing.Color]::FromArgb(70, 150, 240))
 })
 
 # -- Divider --------------------------------------------------------
 $lblDivider           = New-Object System.Windows.Forms.Label
 $lblDivider.Text      = ""
-$lblDivider.BorderStyle = "Fixed3D"
+$lblDivider.BorderStyle = "FixedSingle"
+$lblDivider.BackColor = [System.Drawing.Color]::FromArgb(62, 62, 72)
 $lblDivider.Location  = New-Object System.Drawing.Point(15, 618)
-$lblDivider.Size      = New-Object System.Drawing.Size(588, 2)
+$lblDivider.Size      = New-Object System.Drawing.Size(588, 1)
 
 # -- Store + Close --------------------------------------------------
 $btnStore           = New-Object System.Windows.Forms.Button
@@ -751,7 +769,7 @@ $btnStore.Font      = New-Object System.Drawing.Font("Segoe UI", 10, [System.Dra
 $btnStore.Location  = New-Object System.Drawing.Point(15, 630)
 $btnStore.Size      = New-Object System.Drawing.Size(470, 36)
 $btnStore.FlatStyle = "Flat"
-$btnStore.BackColor = [System.Drawing.Color]::Black
+$btnStore.BackColor = [System.Drawing.Color]::FromArgb(14, 90, 158)
 $btnStore.ForeColor = [System.Drawing.Color]::White
 $btnStore.FlatAppearance.BorderSize = 0
 $btnStore.Add_Click({
@@ -864,9 +882,9 @@ $btnStore.Add_Click({
                 $msg = "Generated launch-claude.ps1 in $projectPath. Zero-keys project -- Claude Code will launch with protection layer only."
             }
             if ($cfgOK) {
-                Set-Status $msg ([System.Drawing.Color]::FromArgb(0, 150, 80))
+                Set-Status $msg ([System.Drawing.Color]::FromArgb(16, 185, 129))
             } else {
-                Set-Status "$msg [WARN] config.json not updated -- menu may still show previous project." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+                Set-Status "$msg [WARN] config.json not updated -- menu may still show previous project." ([System.Drawing.Color]::FromArgb(240, 180, 60))
             }
             return
         }
@@ -874,9 +892,9 @@ $btnStore.Add_Click({
 
     # Fallback: project path was null AND user cancelled the folder picker.
     if ($stored -gt 0) {
-        Set-Status "Stored $stored secret(s) for [$projectName]. Values cleared." ([System.Drawing.Color]::FromArgb(0, 150, 80))
+        Set-Status "Stored $stored secret(s) for [$projectName]. Values cleared." ([System.Drawing.Color]::FromArgb(16, 185, 129))
     } else {
-        Set-Status "Nothing happened -- select a project folder to generate launch-claude.ps1." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+        Set-Status "Nothing happened -- select a project folder to generate launch-claude.ps1." ([System.Drawing.Color]::FromArgb(240, 180, 60))
     }
 })
 
@@ -886,9 +904,9 @@ $btnClose.Font      = New-Object System.Drawing.Font("Segoe UI", 10)
 $btnClose.Location  = New-Object System.Drawing.Point(494, 630)
 $btnClose.Size      = New-Object System.Drawing.Size(109, 36)
 $btnClose.FlatStyle = "Flat"
-$btnClose.BackColor = [System.Drawing.Color]::White
-$btnClose.ForeColor = [System.Drawing.Color]::FromArgb(90, 90, 110)
-$btnClose.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(200, 200, 210)
+$btnClose.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnClose.ForeColor = [System.Drawing.Color]::White
+$btnClose.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(90, 90, 110)
 $btnClose.FlatAppearance.BorderSize  = 1
 $btnClose.Add_Click({ $form.Close() })
 
@@ -945,7 +963,7 @@ function Test-AndRegenerate {
         }
     }
     if (-not $needsRegen) { return $true }
-    Set-Status "Updating launch-claude.ps1 from vault..." ([System.Drawing.Color]::FromArgb(0, 100, 180))
+    Set-Status "Updating launch-claude.ps1 from vault..." ([System.Drawing.Color]::FromArgb(70, 150, 240))
     $vaultLines = cmdkey /list 2>$null
     $keys = $vaultLines | Select-String "target=" | ForEach-Object {
         $t = ($_ -replace ".*target=", "" -replace "\s.*", "").Trim()
@@ -956,12 +974,12 @@ function Test-AndRegenerate {
         # will launch with the protection layer (deny rules, CLAUDE.md
         # reminders) but no vault injection. Warning is visible in the
         # status bar but does NOT block the launch.
-        Set-Status "No vault keys for $projectName. Launching with protection layer only." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+        Set-Status "No vault keys for $projectName. Launching with protection layer only." ([System.Drawing.Color]::FromArgb(240, 180, 60))
     }
     $nextPublicKeys = $keys | Where-Object { $_ -match "URL|ANON|WEBHOOK_URL|WEBHOOK_SECRET" }
     if (Generate-LaunchScript $projectPath $projectName $keys $nextPublicKeys) {
         if ($keys.Count -gt 0) {
-            Set-Status "launch-claude.ps1 updated to v1.5." ([System.Drawing.Color]::FromArgb(0, 130, 70))
+            Set-Status "launch-claude.ps1 updated to v1.5." ([System.Drawing.Color]::FromArgb(16, 185, 129))
         }
         return $true
     }
@@ -1008,9 +1026,9 @@ $btnVSCode.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Dra
 $btnVSCode.Location  = New-Object System.Drawing.Point(201, 690)
 $btnVSCode.Size      = New-Object System.Drawing.Size(128, 36)
 $btnVSCode.FlatStyle = "Flat"
-$btnVSCode.BackColor = [System.Drawing.Color]::FromArgb(0, 90, 158)
+$btnVSCode.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnVSCode.ForeColor = [System.Drawing.Color]::White
-$btnVSCode.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 90, 158)
+$btnVSCode.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnVSCode.FlatAppearance.BorderSize  = 0
 $btnVSCode.Add_Click({
     $projectPath = Get-ProjectPath
@@ -1038,10 +1056,10 @@ $btnVSCode.Add_Click({
         $btnVSCode.Text = "Open in VS Code"
 
         if (-not $codeExe) {
-            Set-Status "VS Code install finished but not detected. Close DSM and try again." ([System.Drawing.Color]::FromArgb(200, 40, 40))
+            Set-Status "VS Code install finished but not detected. Close DSM and try again." ([System.Drawing.Color]::FromArgb(240, 80, 80))
             return
         }
-        Set-Status "VS Code installed. Opening project..." ([System.Drawing.Color]::FromArgb(0, 130, 70))
+        Set-Status "VS Code installed. Opening project..." ([System.Drawing.Color]::FromArgb(16, 185, 129))
     } else {
         Set-Status "Secrets injected. VS Code opening -- type 'claude' in the terminal." ([System.Drawing.Color]::FromArgb(0, 90, 158))
     }
@@ -1088,10 +1106,10 @@ $btnCursor.Add_Click({
         $btnCursor.Text = "Open in Cursor"
 
         if (-not $cursorExe) {
-            Set-Status "Cursor install finished but not detected. Close DSM and try again." ([System.Drawing.Color]::FromArgb(200, 40, 40))
+            Set-Status "Cursor install finished but not detected. Close DSM and try again." ([System.Drawing.Color]::FromArgb(240, 80, 80))
             return
         }
-        Set-Status "Cursor installed. Opening project..." ([System.Drawing.Color]::FromArgb(0, 130, 70))
+        Set-Status "Cursor installed. Opening project..." ([System.Drawing.Color]::FromArgb(16, 185, 129))
     } else {
         Set-Status "Secrets injected. Cursor opening -- type 'claude' in the terminal." ([System.Drawing.Color]::FromArgb(40, 40, 60))
     }
@@ -1108,9 +1126,9 @@ $btnScanLink.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.D
 $btnScanLink.Location  = New-Object System.Drawing.Point(489, 690)
 $btnScanLink.Size      = New-Object System.Drawing.Size(114, 36)
 $btnScanLink.FlatStyle = "Flat"
-$btnScanLink.BackColor = [System.Drawing.Color]::White
-$btnScanLink.ForeColor = [System.Drawing.Color]::FromArgb(0, 90, 158)
-$btnScanLink.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 90, 158)
+$btnScanLink.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnScanLink.ForeColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
+$btnScanLink.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
 $btnScanLink.FlatAppearance.BorderSize  = 1
 $btnScanLink.Add_Click({ Start-Process "https://scan.domitek.ai" })
 
@@ -1127,7 +1145,7 @@ function Update-ProtectionButton {
     $protected = Get-ProtectionState
     if ($protected) {
         $btnProtect.Text      = "Claude Code Protection: ON  (click to disable for demo)"
-        $btnProtect.BackColor = [System.Drawing.Color]::FromArgb(20, 100, 60)
+        $btnProtect.BackColor = [System.Drawing.Color]::FromArgb(16, 160, 90)
         $btnProtect.ForeColor = [System.Drawing.Color]::White
     } else {
         $btnProtect.Text      = "Claude Code Protection: OFF  (click to enable)"
@@ -1192,7 +1210,7 @@ $btnProtect.Add_Click({
 }
 "@
         $settingsJson | Out-File -FilePath $SETTINGS_PATH -Encoding UTF8
-        Set-Status "Protection ENABLED. Claude Code is blocked from reading .env files and env vars." ([System.Drawing.Color]::FromArgb(0, 130, 70))
+        Set-Status "Protection ENABLED. Claude Code is blocked from reading .env files and env vars." ([System.Drawing.Color]::FromArgb(16, 185, 129))
     }
     Update-ProtectionButton
 })
@@ -1201,7 +1219,7 @@ $btnProtect.Add_Click({
 $lblStatus           = New-Object System.Windows.Forms.Label
 $lblStatus.Text      = "Ready - Domitek Secrets Manager v1.5 | scan.domitek.ai"
 $lblStatus.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
-$lblStatus.ForeColor = [System.Drawing.Color]::Gray
+$lblStatus.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
 $lblStatus.Location  = New-Object System.Drawing.Point(15, 810)
 $lblStatus.Size      = New-Object System.Drawing.Size(588, 48)
 $lblStatus.AutoSize  = $false
@@ -1211,7 +1229,7 @@ $lblStatus.MaximumSize = New-Object System.Drawing.Size(588, 48)
 $lblCopyright           = New-Object System.Windows.Forms.Label
 $lblCopyright.Text      = "Copyright (c) 2026 Domitek. All rights reserved.  |  Author: Libis R. Bueno  |  scan.domitek.ai"
 $lblCopyright.Font      = New-Object System.Drawing.Font("Segoe UI", 8)
-$lblCopyright.ForeColor = [System.Drawing.Color]::FromArgb(80, 80, 80)
+$lblCopyright.ForeColor = [System.Drawing.Color]::FromArgb(130, 130, 145)
 $lblCopyright.Location  = New-Object System.Drawing.Point(15, 918)
 $lblCopyright.Size      = New-Object System.Drawing.Size(588, 18)
 $lblCopyright.TextAlign = "MiddleCenter"
