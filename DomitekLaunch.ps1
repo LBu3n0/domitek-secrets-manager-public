@@ -182,11 +182,10 @@ function Step-Update {
     Write-Host "  Downloading latest DSM files from GitHub..." -ForegroundColor Cyan
     Write-Host ""
 
-    # Files that need refreshing on update. Each entry: url suffix, destination.
-    # Destinations use $VAULT_DIR and Get-Config->project_path where needed.
-    $config = Get-Config
-    $projectPath = if ($config -and $config.project_path) { $config.project_path } else { $null }
-
+    # Files that need refreshing on update. All go to C:\DomitekVault.
+    # The setup guide (domitek-setup-guide.md) is intentionally NOT in this
+    # list -- it is a one-time install artifact, not a shared tool file.
+    # Users who want the latest setup guide can read it on GitHub.
     $updateFiles = @(
         @{ src = "DomitekLaunch.ps1";        dst = "$VAULT_DIR\DomitekLaunch.ps1";       hide = $false }
         @{ src = "DomitekLaunch.bat";        dst = "$VAULT_DIR\DomitekLaunch.bat";       hide = $false }
@@ -195,11 +194,6 @@ function Step-Update {
         @{ src = "logo_base64.txt";          dst = "$VAULT_DIR\logo_base64.txt";         hide = $true  }
         @{ src = "template/launch-template.ps1"; dst = "$VAULT_DIR\launch-template.ps1"; hide = $false }
     )
-
-    # Also refresh the setup guide in the user's project folder if we know it
-    if ($projectPath) {
-        $updateFiles += @{ src = "domitek-setup-guide.md"; dst = "$projectPath\domitek-setup-guide.md"; hide = $false }
-    }
 
     $successCount = 0
     $failCount    = 0
