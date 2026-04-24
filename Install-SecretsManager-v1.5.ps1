@@ -29,8 +29,114 @@ $HISTORY_FILE   = "$env:APPDATA\DomitekVault\project_history.json"
 $ROTATION_FILE  = "C:\DomitekVault\rotation.json"
 $LOGO_FILE      = "C:\DomitekVault\logo_base64.txt"
 $CONFIG_FILE    = "C:\DomitekVault\config.json"
+$THEME_FILE     = "C:\DomitekVault\theme.json"
 $MAX_HISTORY    = 5
 $FORM_WIDTH     = 620
+
+# -- Theme palettes -------------------------------------------------
+# Two named palettes. Set-Theme reads the chosen palette and applies
+# colors to all controls. Light is the default per user request.
+$LIGHT_PALETTE = @{
+    Form               = [System.Drawing.Color]::White
+    PanelBg            = [System.Drawing.Color]::White
+    InputBg            = [System.Drawing.Color]::White
+    SecretsRowInputBg  = [System.Drawing.Color]::White
+    Heading            = [System.Drawing.Color]::FromArgb(30, 30, 50)
+    BodyText           = [System.Drawing.Color]::FromArgb(30, 30, 50)
+    HintText           = [System.Drawing.Color]::FromArgb(90, 90, 110)
+    ColumnHeader       = [System.Drawing.Color]::Gray
+    Divider            = [System.Drawing.Color]::FromArgb(220, 220, 230)
+    HeaderDivider      = [System.Drawing.Color]::FromArgb(120, 120, 130)
+    StoreBg            = [System.Drawing.Color]::Black
+    StoreFg            = [System.Drawing.Color]::White
+    PrimaryBlue        = [System.Drawing.Color]::FromArgb(0, 90, 158)
+    PrimaryBlueText    = [System.Drawing.Color]::White
+    OutlinedBg         = [System.Drawing.Color]::White
+    OutlinedFg         = [System.Drawing.Color]::FromArgb(0, 90, 158)
+    OutlinedBorder     = [System.Drawing.Color]::FromArgb(0, 90, 158)
+    DestructiveFg      = [System.Drawing.Color]::FromArgb(214, 56, 56)
+    DestructiveBorder  = [System.Drawing.Color]::FromArgb(214, 56, 56)
+    NeutralBorder      = [System.Drawing.Color]::FromArgb(200, 200, 210)
+    NeutralFg          = [System.Drawing.Color]::FromArgb(90, 90, 110)
+    LaunchBg           = [System.Drawing.Color]::FromArgb(15, 15, 15)
+    LaunchFg           = [System.Drawing.Color]::FromArgb(255, 149, 82)
+    CursorBg           = [System.Drawing.Color]::FromArgb(30, 40, 70)
+    CursorFg           = [System.Drawing.Color]::White
+    ProtectionOnBg     = [System.Drawing.Color]::FromArgb(20, 100, 60)
+    ProtectionOffBg    = [System.Drawing.Color]::FromArgb(160, 40, 40)
+    StatusDefault      = [System.Drawing.Color]::Gray
+    StatusSuccess      = [System.Drawing.Color]::FromArgb(0, 130, 70)
+    StatusInfo         = [System.Drawing.Color]::FromArgb(0, 100, 180)
+    StatusWarning      = [System.Drawing.Color]::FromArgb(180, 120, 0)
+    StatusError        = [System.Drawing.Color]::FromArgb(200, 40, 40)
+    Footer             = [System.Drawing.Color]::FromArgb(80, 80, 80)
+    DaysLabelBg        = [System.Drawing.Color]::White
+    DaysLabelFg        = [System.Drawing.Color]::Gray
+    Icon               = [System.Drawing.Color]::FromArgb(30, 30, 50)
+}
+
+$DARK_PALETTE = @{
+    Form               = [System.Drawing.Color]::FromArgb(13, 13, 17)
+    PanelBg            = [System.Drawing.Color]::FromArgb(26, 26, 34)
+    InputBg            = [System.Drawing.Color]::FromArgb(26, 26, 34)
+    SecretsRowInputBg  = [System.Drawing.Color]::FromArgb(13, 13, 17)
+    Heading            = [System.Drawing.Color]::White
+    BodyText           = [System.Drawing.Color]::White
+    HintText           = [System.Drawing.Color]::FromArgb(160, 160, 175)
+    ColumnHeader       = [System.Drawing.Color]::FromArgb(160, 160, 175)
+    Divider            = [System.Drawing.Color]::FromArgb(46, 46, 56)
+    HeaderDivider      = [System.Drawing.Color]::FromArgb(46, 46, 56)
+    StoreBg            = [System.Drawing.Color]::FromArgb(14, 90, 158)
+    StoreFg            = [System.Drawing.Color]::White
+    PrimaryBlue        = [System.Drawing.Color]::FromArgb(0, 120, 215)
+    PrimaryBlueText    = [System.Drawing.Color]::White
+    OutlinedBg         = [System.Drawing.Color]::FromArgb(26, 26, 34)
+    OutlinedFg         = [System.Drawing.Color]::White
+    OutlinedBorder     = [System.Drawing.Color]::FromArgb(0, 120, 215)
+    DestructiveFg      = [System.Drawing.Color]::FromArgb(240, 80, 80)
+    DestructiveBorder  = [System.Drawing.Color]::FromArgb(240, 80, 80)
+    NeutralBorder      = [System.Drawing.Color]::FromArgb(90, 90, 110)
+    NeutralFg          = [System.Drawing.Color]::White
+    LaunchBg           = [System.Drawing.Color]::FromArgb(15, 15, 15)
+    LaunchFg           = [System.Drawing.Color]::FromArgb(255, 149, 82)
+    CursorBg           = [System.Drawing.Color]::FromArgb(15, 15, 15)
+    CursorFg           = [System.Drawing.Color]::FromArgb(220, 220, 225)
+    ProtectionOnBg     = [System.Drawing.Color]::FromArgb(16, 160, 90)
+    ProtectionOffBg    = [System.Drawing.Color]::FromArgb(160, 40, 40)
+    StatusDefault      = [System.Drawing.Color]::FromArgb(160, 160, 175)
+    StatusSuccess      = [System.Drawing.Color]::FromArgb(16, 185, 129)
+    StatusInfo         = [System.Drawing.Color]::FromArgb(70, 150, 240)
+    StatusWarning      = [System.Drawing.Color]::FromArgb(240, 180, 60)
+    StatusError        = [System.Drawing.Color]::FromArgb(240, 80, 80)
+    Footer             = [System.Drawing.Color]::FromArgb(130, 130, 145)
+    DaysLabelBg        = [System.Drawing.Color]::FromArgb(26, 26, 34)
+    DaysLabelFg        = [System.Drawing.Color]::FromArgb(160, 160, 175)
+    Icon               = [System.Drawing.Color]::White
+}
+
+# Holds the active palette. Defaults to LIGHT per user preference.
+$script:THEME = "light"
+$script:PALETTE = $LIGHT_PALETTE
+
+function Load-Theme {
+    # Read theme preference from disk; default to "light" if missing or unreadable.
+    if (Test-Path $THEME_FILE) {
+        try {
+            $raw = Get-Content $THEME_FILE -Raw -ErrorAction Stop
+            $parsed = $raw | ConvertFrom-Json
+            if ($parsed.theme -eq "dark") { return "dark" }
+        } catch {}
+    }
+    return "light"
+}
+
+function Save-Theme {
+    param([string]$themeName)
+    $dir = Split-Path $THEME_FILE
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    # Theme file is not Hidden -- it's a user preference, not a vault internal.
+    @{ theme = $themeName } | ConvertTo-Json | Out-File $THEME_FILE -Encoding UTF8 -ErrorAction SilentlyContinue
+}
 
 # Load logo at runtime
 $LOGO_BASE64_EMBEDDED = $null
@@ -101,10 +207,10 @@ function Get-DaysRemaining {
 
 function Get-RotationColor {
     param($days)
-    if ($null -eq $days) { return [System.Drawing.Color]::FromArgb(160, 160, 175) }
-    if ($days -gt 30)    { return [System.Drawing.Color]::FromArgb(16, 185, 129) }
-    if ($days -gt 0)     { return [System.Drawing.Color]::FromArgb(240, 180, 60) }
-    return [System.Drawing.Color]::FromArgb(240, 80, 80)
+    if ($null -eq $days) { return $script:PALETTE.DaysLabelFg }
+    if ($days -gt 30)    { return $script:PALETTE.StatusSuccess }
+    if ($days -gt 0)     { return $script:PALETTE.StatusWarning }
+    return $script:PALETTE.StatusError
 }
 
 # -- History helpers ------------------------------------------------
@@ -302,8 +408,8 @@ function Add-SecretRow {
     $txtName.Size        = New-Object System.Drawing.Size(185, 24)
     $txtName.Text        = $defaultName
     $txtName.BorderStyle = "FixedSingle"
-    $txtName.BackColor   = [System.Drawing.Color]::FromArgb(13, 13, 17)
-    $txtName.ForeColor   = [System.Drawing.Color]::White
+    $txtName.BackColor   = $script:PALETTE.SecretsRowInputBg
+    $txtName.ForeColor   = $script:PALETTE.BodyText
 
     $txtValue              = New-Object System.Windows.Forms.TextBox
     $txtValue.Font         = New-Object System.Drawing.Font("Segoe UI", 9)
@@ -311,8 +417,8 @@ function Add-SecretRow {
     $txtValue.Size         = New-Object System.Drawing.Size(185, 24)
     $txtValue.PasswordChar = [char]0x25CF
     $txtValue.BorderStyle  = "FixedSingle"
-    $txtValue.BackColor    = [System.Drawing.Color]::FromArgb(13, 13, 17)
-    $txtValue.ForeColor    = [System.Drawing.Color]::White
+    $txtValue.BackColor    = $script:PALETTE.SecretsRowInputBg
+    $txtValue.ForeColor    = $script:PALETTE.BodyText
     # Fire label refresh whenever the value field changes. The button label
     # at the bottom of the form reads "Generate Script" when all values are
     # empty, "Store to Vault + Generate Script" when any value has content.
@@ -324,8 +430,8 @@ function Add-SecretRow {
     $cboRotation.Size         = New-Object System.Drawing.Size(90, 24)
     $cboRotation.DropDownStyle= "DropDownList"
     $cboRotation.FlatStyle    = "Standard"
-    $cboRotation.BackColor    = [System.Drawing.Color]::FromArgb(13, 13, 17)
-    $cboRotation.ForeColor    = [System.Drawing.Color]::White
+    $cboRotation.BackColor    = $script:PALETTE.SecretsRowInputBg
+    $cboRotation.ForeColor    = $script:PALETTE.BodyText
     $cboRotation.Items.AddRange(@("30 days","90 days","180 days","Never"))
     $cboRotation.SelectedItem = switch ($rotationDays) {
         "30"    { "30 days" }
@@ -340,8 +446,8 @@ function Add-SecretRow {
     $lblDays.Location     = New-Object System.Drawing.Point(488, $daysY)
     $lblDays.Size         = New-Object System.Drawing.Size(95, 18)
     $lblDays.Text         = ""
-    $lblDays.ForeColor    = [System.Drawing.Color]::FromArgb(160, 160, 175)
-    $lblDays.BackColor    = [System.Drawing.Color]::FromArgb(26, 26, 34)
+    $lblDays.ForeColor    = $script:PALETTE.DaysLabelFg
+    $lblDays.BackColor    = $script:PALETTE.DaysLabelBg
 
     $pnlSecrets.Controls.AddRange(@($txtName, $txtValue, $cboRotation, $lblDays))
     $secretRows.Add(@{ Name = $txtName; Value = $txtValue; Rotation = $cboRotation; Days = $lblDays }) | Out-Null
@@ -466,6 +572,29 @@ $lblSub.Location      = New-Object System.Drawing.Point(215, 45)
 $lblSub.Size          = New-Object System.Drawing.Size(390, 18)
 
 $pnlHeader.Controls.AddRange(@($lblVersion, $lblSub))
+
+# -- Theme toggle button (sits in header banner, top-right below version) --
+$btnTheme              = New-Object System.Windows.Forms.Button
+$btnTheme.Text         = "Dark"
+$btnTheme.Font         = New-Object System.Drawing.Font("Segoe UI", 8)
+$btnTheme.Location     = New-Object System.Drawing.Point(545, 32)
+$btnTheme.Size         = New-Object System.Drawing.Size(60, 22)
+$btnTheme.FlatStyle    = "Flat"
+$btnTheme.BackColor    = [System.Drawing.Color]::White
+$btnTheme.FlatAppearance.BorderSize = 1
+$btnTheme.Cursor       = [System.Windows.Forms.Cursors]::Hand
+$btnTheme.Add_Click({
+    if ($script:THEME -eq "dark") {
+        $script:THEME   = "light"
+        $script:PALETTE = $LIGHT_PALETTE
+    } else {
+        $script:THEME   = "dark"
+        $script:PALETTE = $DARK_PALETTE
+    }
+    Save-Theme $script:THEME
+    Apply-Theme
+})
+$pnlHeader.Controls.Add($btnTheme)
 
 # -- Divider separating header banner from form content --
 $lblHeaderDivider           = New-Object System.Windows.Forms.Label
@@ -1146,11 +1275,11 @@ function Update-ProtectionButton {
     $protected = Get-ProtectionState
     if ($protected) {
         $btnProtect.Text      = "Claude Code Protection: ON  (click to disable for demo)"
-        $btnProtect.BackColor = [System.Drawing.Color]::FromArgb(16, 160, 90)
+        $btnProtect.BackColor = $script:PALETTE.ProtectionOnBg
         $btnProtect.ForeColor = [System.Drawing.Color]::White
     } else {
         $btnProtect.Text      = "Claude Code Protection: OFF  (click to enable)"
-        $btnProtect.BackColor = [System.Drawing.Color]::FromArgb(160, 40, 40)
+        $btnProtect.BackColor = $script:PALETTE.ProtectionOffBg
         $btnProtect.ForeColor = [System.Drawing.Color]::White
     }
 }
@@ -1252,9 +1381,152 @@ $form.Controls.AddRange(@(
     $lblCopyright
 ))
 
+# -- Theme application --------------------------------------------
+# Re-skins every control based on the active palette. Called on form
+# startup with the saved theme, and on toggle button click.
+function Apply-Theme {
+    $p = $script:PALETTE
+
+    # Form
+    $form.BackColor = $p.Form
+    $form.ForeColor = $p.BodyText
+
+    # Header banner stays white in BOTH themes (Domitek logo on white).
+    # Header subtitle stays black, version stays dark gray. No-op here.
+
+    # Header divider (between banner and form body)
+    $lblHeaderDivider.BackColor = $p.HeaderDivider
+
+    # Section headings
+    $lblProj.ForeColor    = $p.Heading
+    $lblRecent.ForeColor  = $p.Heading
+    $lblType.ForeColor    = $p.Heading
+    $lblSecrets.ForeColor = $p.Heading
+
+    # Hints + column headers
+    $lblProjHint.ForeColor = $p.HintText
+    $lblColKey.ForeColor   = $p.ColumnHeader
+    $lblColVal.ForeColor   = $p.ColumnHeader
+    $lblColRot.ForeColor   = $p.ColumnHeader
+    $lblColDays.ForeColor  = $p.ColumnHeader
+
+    # Inputs
+    $txtProject.BackColor = $p.InputBg
+    $txtProject.ForeColor = $p.BodyText
+    $cboHistory.BackColor = $p.InputBg
+    $cboHistory.ForeColor = $p.BodyText
+    $cboType.BackColor    = $p.InputBg
+    $cboType.ForeColor    = $p.BodyText
+    $pnlSecrets.BackColor = $p.PanelBg
+
+    # Re-skin existing secret rows that may already exist in $secretRows
+    foreach ($row in $secretRows) {
+        $row.Name.BackColor     = $p.SecretsRowInputBg
+        $row.Name.ForeColor     = $p.BodyText
+        $row.Value.BackColor    = $p.SecretsRowInputBg
+        $row.Value.ForeColor    = $p.BodyText
+        $row.Rotation.BackColor = $p.SecretsRowInputBg
+        $row.Rotation.ForeColor = $p.BodyText
+        $row.Days.BackColor     = $p.DaysLabelBg
+        # Days FG is already managed by Update-DaysLabels per remaining-days.
+    }
+
+    # Dividers
+    $lblSectionDivider1.BackColor = $p.Divider
+    $lblDivider.BackColor         = $p.Divider
+
+    # Buttons -- outlined "Browse style" group
+    foreach ($btn in @($btnBrowse, $btnAdd, $btnPruneMissing, $btnViewVault, $btnScanLink)) {
+        $btn.BackColor = $p.OutlinedBg
+        $btn.ForeColor = $p.OutlinedFg
+        $btn.FlatAppearance.BorderColor = $p.OutlinedBorder
+    }
+
+    # Destructive buttons
+    foreach ($btn in @($btnClear, $btnClearHistory)) {
+        $btn.BackColor = $p.OutlinedBg
+        $btn.ForeColor = $p.DestructiveFg
+        $btn.FlatAppearance.BorderColor = $p.DestructiveBorder
+    }
+
+    # Close button (neutral)
+    $btnClose.BackColor = $p.OutlinedBg
+    $btnClose.ForeColor = $p.NeutralFg
+    $btnClose.FlatAppearance.BorderColor = $p.NeutralBorder
+
+    # Generate Script (primary CTA, solid)
+    $btnStore.BackColor = $p.StoreBg
+    $btnStore.ForeColor = $p.StoreFg
+
+    # Brand-treatment trio (light-mode = solid blue VS Code, dark Cursor)
+    if ($script:THEME -eq "dark") {
+        # Dark: brand-color OUTLINE on near-black bg
+        $btnVSCode.BackColor = $p.LaunchBg
+        $btnVSCode.ForeColor = [System.Drawing.Color]::FromArgb(0, 122, 204)
+        $btnVSCode.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 122, 204)
+        $btnVSCode.FlatAppearance.BorderSize  = 1
+        $btnCursor.BackColor = $p.CursorBg
+        $btnCursor.ForeColor = $p.CursorFg
+        $btnCursor.FlatAppearance.BorderColor = $p.CursorFg
+        $btnCursor.FlatAppearance.BorderSize  = 1
+    } else {
+        # Light: SOLID FILLS per image 1
+        $btnVSCode.BackColor = $p.PrimaryBlue
+        $btnVSCode.ForeColor = $p.PrimaryBlueText
+        $btnVSCode.FlatAppearance.BorderColor = $p.PrimaryBlue
+        $btnVSCode.FlatAppearance.BorderSize  = 0
+        $btnCursor.BackColor = $p.CursorBg
+        $btnCursor.ForeColor = $p.CursorFg
+        $btnCursor.FlatAppearance.BorderColor = $p.CursorBg
+        $btnCursor.FlatAppearance.BorderSize  = 0
+    }
+
+    # Launch Claude Code (Claude brand colors -- same in both themes)
+    $btnLaunch.BackColor = $p.LaunchBg
+    $btnLaunch.ForeColor = $p.LaunchFg
+    $btnLaunch.FlatAppearance.BorderColor = $p.LaunchFg
+
+    # View Vault: solid in light, outlined in dark
+    if ($script:THEME -eq "dark") {
+        $btnViewVault.BackColor = $p.OutlinedBg
+        $btnViewVault.ForeColor = $p.OutlinedFg
+        $btnViewVault.FlatAppearance.BorderColor = $p.OutlinedBorder
+        $btnViewVault.FlatAppearance.BorderSize  = 1
+    } else {
+        $btnViewVault.BackColor = $p.PrimaryBlue
+        $btnViewVault.ForeColor = $p.PrimaryBlueText
+        $btnViewVault.FlatAppearance.BorderColor = $p.PrimaryBlue
+        $btnViewVault.FlatAppearance.BorderSize  = 0
+    }
+
+    # Status bar, footer
+    $lblStatus.ForeColor    = $p.StatusDefault
+    $lblCopyright.ForeColor = $p.Footer
+
+    # Theme toggle button glyph
+    if ($null -ne $btnTheme) {
+        if ($script:THEME -eq "dark") {
+            $btnTheme.Text = "Light"
+        } else {
+            $btnTheme.Text = "Dark"
+        }
+        $btnTheme.ForeColor = $p.Icon
+        $btnTheme.FlatAppearance.BorderColor = $p.Icon
+    }
+
+    # Protection banner reflects current state in current theme
+    Update-ProtectionButton
+    $form.Refresh()
+}
+
+# -- Initialize theme on startup ---------------------------------
+$script:THEME = Load-Theme
+if ($script:THEME -eq "dark") { $script:PALETTE = $DARK_PALETTE } else { $script:PALETTE = $LIGHT_PALETTE }
+
 Refresh-History
 Update-ProtectionButton
 Update-StoreButtonLabel
+Apply-Theme
 $form.ShowDialog() | Out-Null
 '@
 
