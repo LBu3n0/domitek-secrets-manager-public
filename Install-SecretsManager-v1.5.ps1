@@ -517,7 +517,7 @@ $lblRecent.Size       = New-Object System.Drawing.Size(120, 16)
 $cboHistory               = New-Object System.Windows.Forms.ComboBox
 $cboHistory.Font          = New-Object System.Drawing.Font("Segoe UI", 9)
 $cboHistory.Location      = New-Object System.Drawing.Point(15, 176)
-$cboHistory.Size          = New-Object System.Drawing.Size(588, 24)
+$cboHistory.Size          = New-Object System.Drawing.Size(420, 24)
 $cboHistory.DropDownStyle = "DropDownList"
 $cboHistory.FlatStyle     = "Flat"
 $cboHistory.Add_SelectedIndexChanged({
@@ -526,6 +526,78 @@ $cboHistory.Add_SelectedIndexChanged({
         Load-VaultKeys $cboHistory.SelectedItem.ToString()
         Update-DaysLabels $cboHistory.SelectedItem.ToString()
     }
+})
+
+# -- Clear History & Prune Missing buttons (right of dropdown) -------
+$btnPruneMissing           = New-Object System.Windows.Forms.Button
+$btnPruneMissing.Text      = "Prune Missing"
+$btnPruneMissing.Font      = New-Object System.Drawing.Font("Segoe UI", 8)
+$btnPruneMissing.Location  = New-Object System.Drawing.Point(441, 176)
+$btnPruneMissing.Size      = New-Object System.Drawing.Size(80, 24)
+$btnPruneMissing.FlatStyle = "Flat"
+$btnPruneMissing.BackColor = [System.Drawing.Color]::FromArgb(230, 240, 250)
+$btnPruneMissing.Add_Click({
+    # Read history, keep entries whose folders still exist, drop the rest.
+    # If a legacy short-name entry (no drive letter) is in history, leave
+    # it alone -- we can't tell whether the folder exists without knowing
+    # the base path.
+    $existing = Load-History
+    if ($null -eq $existing -or $existing.Count -eq 0) {
+        Set-Status "History is already empty -- nothing to prune." ([System.Drawing.Color]::FromArgb(180, 120, 0))
+        return
+    }
+    $kept    = [System.Collections.ArrayList]@()
+    $dropped = 0
+    foreach ($item in $existing) {
+        if ([string]::IsNullOrWhiteSpace($item)) { continue }
+        $isRooted = $false
+        try { $isRooted = [System.IO.Path]::IsPathRooted($item) } catch { $isRooted = $false }
+        if ($isRooted) {
+            # Rooted path: we can test. If folder exists, keep; else drop.
+            if (Test-Path $item) { $kept.Add($item) | Out-Null } else { $dropped++ }
+        } else {
+            # Short name (legacy) -- cannot verify, keep it to be safe.
+            $kept.Add($item) | Out-Null
+        }
+    }
+    if ($dropped -eq 0) {
+        Set-Status "All history entries point at existing folders -- nothing to prune." ([System.Drawing.Color]::FromArgb(0, 100, 180))
+        return
+    }
+    # Write the kept list back to history.
+    $dir = Split-Path $HISTORY_FILE
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    $kept | ConvertTo-Json | Out-File $HISTORY_FILE -Encoding UTF8
+    Refresh-History
+    Set-Status "Pruned $dropped missing folder(s) from history. $($kept.Count) entries remain." ([System.Drawing.Color]::FromArgb(0, 130, 70))
+})
+
+$btnClearHistory           = New-Object System.Windows.Forms.Button
+$btnClearHistory.Text      = "Clear History"
+$btnClearHistory.Font      = New-Object System.Drawing.Font("Segoe UI", 8)
+$btnClearHistory.Location  = New-Object System.Drawing.Point(525, 176)
+$btnClearHistory.Size      = New-Object System.Drawing.Size(78, 24)
+$btnClearHistory.FlatStyle = "Flat"
+$btnClearHistory.BackColor = [System.Drawing.Color]::FromArgb(250, 235, 235)
+$btnClearHistory.Add_Click({
+    # Destructive -- confirm before wiping.
+    $result = [System.Windows.Forms.MessageBox]::Show(
+        "Clear all entries from the Recent projects list?`n`nThis only removes history entries -- vault credentials and project folders are NOT affected.",
+        "Clear Recent Projects History",
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Question
+    )
+    if ($result -ne [System.Windows.Forms.DialogResult]::Yes) { return }
+    if (Test-Path $HISTORY_FILE) {
+        try {
+            Remove-Item $HISTORY_FILE -Force -ErrorAction Stop
+        } catch {
+            Set-Status "ERROR: Could not clear history: $($_.Exception.Message)" ([System.Drawing.Color]::Red)
+            return
+        }
+    }
+    Refresh-History
+    Set-Status "Recent projects history cleared." ([System.Drawing.Color]::FromArgb(0, 130, 70))
 })
 
 # -- Project Type ---------------------------------------------------
@@ -1108,7 +1180,7 @@ $lblCopyright.TextAlign = "MiddleCenter"
 $form.Controls.AddRange(@(
     $pnlHeader,
     $lblProj, $txtProject, $btnBrowse, $lblProjHint,
-    $lblRecent, $cboHistory,
+    $lblRecent, $cboHistory, $btnPruneMissing, $btnClearHistory,
     $lblType, $cboType, $lblTypeHint,
     $lblSecrets, $lblColKey, $lblColVal, $lblColRot, $lblColDays, $pnlSecrets,
     $btnAdd, $btnClear, $btnViewVault,
