@@ -302,7 +302,7 @@ function Add-SecretRow {
     $txtName.Size        = New-Object System.Drawing.Size(185, 24)
     $txtName.Text        = $defaultName
     $txtName.BorderStyle = "FixedSingle"
-    $txtName.BackColor   = [System.Drawing.Color]::FromArgb(30, 30, 36)
+    $txtName.BackColor   = [System.Drawing.Color]::FromArgb(13, 13, 17)
     $txtName.ForeColor   = [System.Drawing.Color]::White
 
     $txtValue              = New-Object System.Windows.Forms.TextBox
@@ -311,7 +311,7 @@ function Add-SecretRow {
     $txtValue.Size         = New-Object System.Drawing.Size(185, 24)
     $txtValue.PasswordChar = [char]0x25CF
     $txtValue.BorderStyle  = "FixedSingle"
-    $txtValue.BackColor    = [System.Drawing.Color]::FromArgb(30, 30, 36)
+    $txtValue.BackColor    = [System.Drawing.Color]::FromArgb(13, 13, 17)
     $txtValue.ForeColor    = [System.Drawing.Color]::White
     # Fire label refresh whenever the value field changes. The button label
     # at the bottom of the form reads "Generate Script" when all values are
@@ -324,7 +324,7 @@ function Add-SecretRow {
     $cboRotation.Size         = New-Object System.Drawing.Size(90, 24)
     $cboRotation.DropDownStyle= "DropDownList"
     $cboRotation.FlatStyle    = "Standard"
-    $cboRotation.BackColor    = [System.Drawing.Color]::FromArgb(30, 30, 36)
+    $cboRotation.BackColor    = [System.Drawing.Color]::FromArgb(13, 13, 17)
     $cboRotation.ForeColor    = [System.Drawing.Color]::White
     $cboRotation.Items.AddRange(@("30 days","90 days","180 days","Never"))
     $cboRotation.SelectedItem = switch ($rotationDays) {
@@ -341,7 +341,7 @@ function Add-SecretRow {
     $lblDays.Size         = New-Object System.Drawing.Size(95, 18)
     $lblDays.Text         = ""
     $lblDays.ForeColor    = [System.Drawing.Color]::FromArgb(160, 160, 175)
-    $lblDays.BackColor    = [System.Drawing.Color]::FromArgb(42, 42, 50)
+    $lblDays.BackColor    = [System.Drawing.Color]::FromArgb(26, 26, 34)
 
     $pnlSecrets.Controls.AddRange(@($txtName, $txtValue, $cboRotation, $lblDays))
     $secretRows.Add(@{ Name = $txtName; Value = $txtValue; Rotation = $cboRotation; Days = $lblDays }) | Out-Null
@@ -399,7 +399,7 @@ $form.ClientSize       = New-Object System.Drawing.Size(620, 959)
 $form.StartPosition    = "CenterScreen"
 $form.FormBorderStyle  = "FixedSingle"
 $form.MaximizeBox      = $false
-$form.BackColor        = [System.Drawing.Color]::FromArgb(30, 30, 36)
+$form.BackColor        = [System.Drawing.Color]::FromArgb(13, 13, 17)
 $form.ForeColor        = [System.Drawing.Color]::White
 
 # Set form icon if available
@@ -471,7 +471,7 @@ $pnlHeader.Controls.AddRange(@($lblVersion, $lblSub))
 $lblHeaderDivider           = New-Object System.Windows.Forms.Label
 $lblHeaderDivider.Text      = ""
 $lblHeaderDivider.BorderStyle = "FixedSingle"
-$lblHeaderDivider.BackColor = [System.Drawing.Color]::FromArgb(62, 62, 72)
+$lblHeaderDivider.BackColor = [System.Drawing.Color]::FromArgb(46, 46, 56)
 $lblHeaderDivider.Location  = New-Object System.Drawing.Point(0, 76)
 $lblHeaderDivider.Size      = New-Object System.Drawing.Size(620, 1)
 
@@ -488,7 +488,7 @@ $txtProject.Font      = New-Object System.Drawing.Font("Segoe UI", 10)
 $txtProject.Location  = New-Object System.Drawing.Point(15, 115)
 $txtProject.Size      = New-Object System.Drawing.Size(490, 26)
 $txtProject.BorderStyle = "Fixed3D"
-$txtProject.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$txtProject.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $txtProject.ForeColor = [System.Drawing.Color]::White
 
 $btnBrowse            = New-Object System.Windows.Forms.Button
@@ -497,7 +497,7 @@ $btnBrowse.Font       = New-Object System.Drawing.Font("Segoe UI", 9)
 $btnBrowse.Location   = New-Object System.Drawing.Point(515, 114)
 $btnBrowse.Size       = New-Object System.Drawing.Size(88, 28)
 $btnBrowse.FlatStyle  = "Flat"
-$btnBrowse.BackColor  = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnBrowse.BackColor  = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $btnBrowse.ForeColor  = [System.Drawing.Color]::White
 $btnBrowse.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnBrowse.FlatAppearance.BorderSize  = 1
@@ -542,7 +542,7 @@ $cboHistory.Location      = New-Object System.Drawing.Point(15, 198)
 $cboHistory.Size          = New-Object System.Drawing.Size(588, 24)
 $cboHistory.DropDownStyle = "DropDownList"
 $cboHistory.FlatStyle     = "Standard"
-$cboHistory.BackColor     = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$cboHistory.BackColor     = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $cboHistory.ForeColor     = [System.Drawing.Color]::White
 $cboHistory.Add_SelectedIndexChanged({
     if ($cboHistory.SelectedItem) {
@@ -559,7 +559,7 @@ $btnPruneMissing.Font      = New-Object System.Drawing.Font("Segoe UI", 8)
 $btnPruneMissing.Location  = New-Object System.Drawing.Point(409, 228)
 $btnPruneMissing.Size      = New-Object System.Drawing.Size(90, 22)
 $btnPruneMissing.FlatStyle = "Flat"
-$btnPruneMissing.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnPruneMissing.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $btnPruneMissing.ForeColor = [System.Drawing.Color]::White
 $btnPruneMissing.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnPruneMissing.FlatAppearance.BorderSize  = 1
@@ -605,7 +605,7 @@ $btnClearHistory.Font      = New-Object System.Drawing.Font("Segoe UI", 8)
 $btnClearHistory.Location  = New-Object System.Drawing.Point(513, 228)
 $btnClearHistory.Size      = New-Object System.Drawing.Size(90, 22)
 $btnClearHistory.FlatStyle = "Flat"
-$btnClearHistory.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnClearHistory.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $btnClearHistory.ForeColor = [System.Drawing.Color]::FromArgb(240, 80, 80)
 $btnClearHistory.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(240, 80, 80)
 $btnClearHistory.FlatAppearance.BorderSize  = 1
@@ -634,7 +634,7 @@ $btnClearHistory.Add_Click({
 $lblSectionDivider1           = New-Object System.Windows.Forms.Label
 $lblSectionDivider1.Text      = ""
 $lblSectionDivider1.BorderStyle = "FixedSingle"
-$lblSectionDivider1.BackColor = [System.Drawing.Color]::FromArgb(62, 62, 72)
+$lblSectionDivider1.BackColor = [System.Drawing.Color]::FromArgb(46, 46, 56)
 $lblSectionDivider1.Location  = New-Object System.Drawing.Point(15, 255)
 $lblSectionDivider1.Size      = New-Object System.Drawing.Size(588, 1)
 
@@ -652,7 +652,7 @@ $cboType.Location     = New-Object System.Drawing.Point(15, 292)
 $cboType.Size         = New-Object System.Drawing.Size(588, 26)
 $cboType.DropDownStyle= "DropDownList"
 $cboType.FlatStyle    = "Standard"
-$cboType.BackColor    = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$cboType.BackColor    = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $cboType.ForeColor    = [System.Drawing.Color]::White
 $cboType.Items.AddRange(@("Claude Code Assistant", "Claude Code Application"))
 $cboType.SelectedIndex = 0
@@ -705,7 +705,7 @@ $pnlSecrets.Location     = New-Object System.Drawing.Point(15, 395)
 $pnlSecrets.Size         = New-Object System.Drawing.Size(588, 190)
 $pnlSecrets.AutoScroll   = $true
 $pnlSecrets.BorderStyle  = "FixedSingle"
-$pnlSecrets.BackColor    = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$pnlSecrets.BackColor    = [System.Drawing.Color]::FromArgb(26, 26, 34)
 
 Load-ProjectType "Claude Code Assistant"
 
@@ -716,7 +716,7 @@ $btnAdd.Font      = New-Object System.Drawing.Font("Segoe UI", 9)
 $btnAdd.Location  = New-Object System.Drawing.Point(15, 595)
 $btnAdd.Size      = New-Object System.Drawing.Size(120, 28)
 $btnAdd.FlatStyle = "Flat"
-$btnAdd.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnAdd.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $btnAdd.ForeColor = [System.Drawing.Color]::White
 $btnAdd.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnAdd.FlatAppearance.BorderSize  = 1
@@ -728,7 +728,7 @@ $btnClear.Font      = New-Object System.Drawing.Font("Segoe UI", 9)
 $btnClear.Location  = New-Object System.Drawing.Point(148, 595)
 $btnClear.Size      = New-Object System.Drawing.Size(110, 28)
 $btnClear.FlatStyle = "Flat"
-$btnClear.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnClear.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $btnClear.ForeColor = [System.Drawing.Color]::FromArgb(240, 80, 80)
 $btnClear.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(240, 80, 80)
 $btnClear.FlatAppearance.BorderSize  = 1
@@ -746,7 +746,7 @@ $btnViewVault.Font      = New-Object System.Drawing.Font("Segoe UI", 9)
 $btnViewVault.Location  = New-Object System.Drawing.Point(267, 595)
 $btnViewVault.Size      = New-Object System.Drawing.Size(100, 28)
 $btnViewVault.FlatStyle = "Flat"
-$btnViewVault.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnViewVault.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $btnViewVault.ForeColor = [System.Drawing.Color]::White
 $btnViewVault.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnViewVault.FlatAppearance.BorderSize  = 1
@@ -759,7 +759,7 @@ $btnViewVault.Add_Click({
 $lblDivider           = New-Object System.Windows.Forms.Label
 $lblDivider.Text      = ""
 $lblDivider.BorderStyle = "FixedSingle"
-$lblDivider.BackColor = [System.Drawing.Color]::FromArgb(62, 62, 72)
+$lblDivider.BackColor = [System.Drawing.Color]::FromArgb(46, 46, 56)
 $lblDivider.Location  = New-Object System.Drawing.Point(15, 633)
 $lblDivider.Size      = New-Object System.Drawing.Size(588, 1)
 
@@ -905,7 +905,7 @@ $btnClose.Font      = New-Object System.Drawing.Font("Segoe UI", 10)
 $btnClose.Location  = New-Object System.Drawing.Point(494, 645)
 $btnClose.Size      = New-Object System.Drawing.Size(109, 36)
 $btnClose.FlatStyle = "Flat"
-$btnClose.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnClose.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $btnClose.ForeColor = [System.Drawing.Color]::White
 $btnClose.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(90, 90, 110)
 $btnClose.FlatAppearance.BorderSize  = 1
@@ -1027,9 +1027,9 @@ $btnVSCode.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Dra
 $btnVSCode.Location  = New-Object System.Drawing.Point(201, 705)
 $btnVSCode.Size      = New-Object System.Drawing.Size(128, 36)
 $btnVSCode.FlatStyle = "Flat"
-$btnVSCode.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
-$btnVSCode.ForeColor = [System.Drawing.Color]::White
-$btnVSCode.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
+$btnVSCode.BackColor = [System.Drawing.Color]::FromArgb(15, 15, 15)
+$btnVSCode.ForeColor = [System.Drawing.Color]::FromArgb(0, 122, 204)
+$btnVSCode.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 122, 204)
 $btnVSCode.FlatAppearance.BorderSize  = 1
 $btnVSCode.Add_Click({
     $projectPath = Get-ProjectPath
@@ -1077,9 +1077,9 @@ $btnCursor.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Dra
 $btnCursor.Location  = New-Object System.Drawing.Point(345, 705)
 $btnCursor.Size      = New-Object System.Drawing.Size(128, 36)
 $btnCursor.FlatStyle = "Flat"
-$btnCursor.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
-$btnCursor.ForeColor = [System.Drawing.Color]::White
-$btnCursor.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(100, 110, 160)
+$btnCursor.BackColor = [System.Drawing.Color]::FromArgb(15, 15, 15)
+$btnCursor.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 225)
+$btnCursor.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(220, 220, 225)
 $btnCursor.FlatAppearance.BorderSize  = 1
 $btnCursor.Add_Click({
     $projectPath = Get-ProjectPath
@@ -1127,7 +1127,7 @@ $btnScanLink.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.D
 $btnScanLink.Location  = New-Object System.Drawing.Point(489, 705)
 $btnScanLink.Size      = New-Object System.Drawing.Size(114, 36)
 $btnScanLink.FlatStyle = "Flat"
-$btnScanLink.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
+$btnScanLink.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 34)
 $btnScanLink.ForeColor = [System.Drawing.Color]::White
 $btnScanLink.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnScanLink.FlatAppearance.BorderSize  = 1
