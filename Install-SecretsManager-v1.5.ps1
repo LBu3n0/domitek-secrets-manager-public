@@ -395,7 +395,7 @@ function Set-Status {
 # -- Form -----------------------------------------------------------
 $form                  = New-Object System.Windows.Forms.Form
 $form.Text             = "Domitek Secrets Manager $VERSION"
-$form.ClientSize       = New-Object System.Drawing.Size(620, 944)
+$form.ClientSize       = New-Object System.Drawing.Size(620, 959)
 $form.StartPosition    = "CenterScreen"
 $form.FormBorderStyle  = "FixedSingle"
 $form.MaximizeBox      = $false
@@ -533,12 +533,12 @@ $lblRecent            = New-Object System.Windows.Forms.Label
 $lblRecent.Text       = "Recent projects"
 $lblRecent.Font       = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
 $lblRecent.ForeColor  = [System.Drawing.Color]::White
-$lblRecent.Location   = New-Object System.Drawing.Point(15, 155)
+$lblRecent.Location   = New-Object System.Drawing.Point(15, 170)
 $lblRecent.Size       = New-Object System.Drawing.Size(200, 22)
 
 $cboHistory               = New-Object System.Windows.Forms.ComboBox
 $cboHistory.Font          = New-Object System.Drawing.Font("Segoe UI", 9)
-$cboHistory.Location      = New-Object System.Drawing.Point(15, 183)
+$cboHistory.Location      = New-Object System.Drawing.Point(15, 198)
 $cboHistory.Size          = New-Object System.Drawing.Size(588, 24)
 $cboHistory.DropDownStyle = "DropDownList"
 $cboHistory.FlatStyle     = "Standard"
@@ -556,12 +556,12 @@ $cboHistory.Add_SelectedIndexChanged({
 $btnPruneMissing           = New-Object System.Windows.Forms.Button
 $btnPruneMissing.Text      = "Prune Missing"
 $btnPruneMissing.Font      = New-Object System.Drawing.Font("Segoe UI", 8)
-$btnPruneMissing.Location  = New-Object System.Drawing.Point(409, 213)
+$btnPruneMissing.Location  = New-Object System.Drawing.Point(409, 228)
 $btnPruneMissing.Size      = New-Object System.Drawing.Size(90, 22)
 $btnPruneMissing.FlatStyle = "Flat"
 $btnPruneMissing.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
-$btnPruneMissing.ForeColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
-$btnPruneMissing.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
+$btnPruneMissing.ForeColor = [System.Drawing.Color]::White
+$btnPruneMissing.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnPruneMissing.FlatAppearance.BorderSize  = 1
 $btnPruneMissing.Add_Click({
     # Read history, keep entries whose folders still exist, drop the rest.
@@ -602,7 +602,7 @@ $btnPruneMissing.Add_Click({
 $btnClearHistory           = New-Object System.Windows.Forms.Button
 $btnClearHistory.Text      = "Clear History"
 $btnClearHistory.Font      = New-Object System.Drawing.Font("Segoe UI", 8)
-$btnClearHistory.Location  = New-Object System.Drawing.Point(513, 213)
+$btnClearHistory.Location  = New-Object System.Drawing.Point(513, 228)
 $btnClearHistory.Size      = New-Object System.Drawing.Size(90, 22)
 $btnClearHistory.FlatStyle = "Flat"
 $btnClearHistory.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
@@ -635,7 +635,7 @@ $lblSectionDivider1           = New-Object System.Windows.Forms.Label
 $lblSectionDivider1.Text      = ""
 $lblSectionDivider1.BorderStyle = "FixedSingle"
 $lblSectionDivider1.BackColor = [System.Drawing.Color]::FromArgb(62, 62, 72)
-$lblSectionDivider1.Location  = New-Object System.Drawing.Point(15, 240)
+$lblSectionDivider1.Location  = New-Object System.Drawing.Point(15, 255)
 $lblSectionDivider1.Size      = New-Object System.Drawing.Size(588, 1)
 
 # -- Project Type ---------------------------------------------------
@@ -643,12 +643,12 @@ $lblType          = New-Object System.Windows.Forms.Label
 $lblType.Text     = "Project Type"
 $lblType.Font     = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
 $lblType.ForeColor = [System.Drawing.Color]::White
-$lblType.Location = New-Object System.Drawing.Point(15, 250)
+$lblType.Location = New-Object System.Drawing.Point(15, 265)
 $lblType.Size     = New-Object System.Drawing.Size(580, 22)
 
 $cboType              = New-Object System.Windows.Forms.ComboBox
 $cboType.Font         = New-Object System.Drawing.Font("Segoe UI", 10)
-$cboType.Location     = New-Object System.Drawing.Point(15, 277)
+$cboType.Location     = New-Object System.Drawing.Point(15, 292)
 $cboType.Size         = New-Object System.Drawing.Size(588, 26)
 $cboType.DropDownStyle= "DropDownList"
 $cboType.FlatStyle    = "Standard"
@@ -660,7 +660,7 @@ $cboType.Add_SelectedIndexChanged({ Load-ProjectType $cboType.SelectedItem })
 
 $lblTypeHint          = New-Object System.Windows.Forms.Label
 $lblTypeHint.Font     = New-Object System.Drawing.Font("Segoe UI", 8)
-$lblTypeHint.Location = New-Object System.Drawing.Point(15, 307)
+$lblTypeHint.Location = New-Object System.Drawing.Point(15, 322)
 $lblTypeHint.Size     = New-Object System.Drawing.Size(588, 32)
 $lblTypeHint.AutoSize = $false
 
@@ -669,39 +669,39 @@ $lblSecrets          = New-Object System.Windows.Forms.Label
 $lblSecrets.Text     = "Secrets"
 $lblSecrets.Font     = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
 $lblSecrets.ForeColor = [System.Drawing.Color]::White
-$lblSecrets.Location = New-Object System.Drawing.Point(15, 342)
+$lblSecrets.Location = New-Object System.Drawing.Point(15, 357)
 $lblSecrets.Size     = New-Object System.Drawing.Size(100, 22)
 
 $lblColKey           = New-Object System.Windows.Forms.Label
 $lblColKey.Text      = "KEY NAME"
 $lblColKey.Font      = New-Object System.Drawing.Font("Segoe UI", 7, [System.Drawing.FontStyle]::Bold)
 $lblColKey.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
-$lblColKey.Location  = New-Object System.Drawing.Point(20, 364)
+$lblColKey.Location  = New-Object System.Drawing.Point(20, 379)
 $lblColKey.Size      = New-Object System.Drawing.Size(180, 14)
 
 $lblColVal           = New-Object System.Windows.Forms.Label
 $lblColVal.Text      = "SECRET VALUE"
 $lblColVal.Font      = New-Object System.Drawing.Font("Segoe UI", 7, [System.Drawing.FontStyle]::Bold)
 $lblColVal.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
-$lblColVal.Location  = New-Object System.Drawing.Point(210, 364)
+$lblColVal.Location  = New-Object System.Drawing.Point(210, 379)
 $lblColVal.Size      = New-Object System.Drawing.Size(175, 14)
 
 $lblColRot           = New-Object System.Windows.Forms.Label
 $lblColRot.Text      = "ROTATE"
 $lblColRot.Font      = New-Object System.Drawing.Font("Segoe UI", 7, [System.Drawing.FontStyle]::Bold)
 $lblColRot.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
-$lblColRot.Location  = New-Object System.Drawing.Point(398, 364)
+$lblColRot.Location  = New-Object System.Drawing.Point(398, 379)
 $lblColRot.Size      = New-Object System.Drawing.Size(80, 14)
 
 $lblColDays          = New-Object System.Windows.Forms.Label
 $lblColDays.Text     = "STATUS"
 $lblColDays.Font     = New-Object System.Drawing.Font("Segoe UI", 7, [System.Drawing.FontStyle]::Bold)
 $lblColDays.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
-$lblColDays.Location  = New-Object System.Drawing.Point(488, 364)
+$lblColDays.Location  = New-Object System.Drawing.Point(488, 379)
 $lblColDays.Size      = New-Object System.Drawing.Size(100, 14)
 
 $pnlSecrets              = New-Object System.Windows.Forms.Panel
-$pnlSecrets.Location     = New-Object System.Drawing.Point(15, 380)
+$pnlSecrets.Location     = New-Object System.Drawing.Point(15, 395)
 $pnlSecrets.Size         = New-Object System.Drawing.Size(588, 190)
 $pnlSecrets.AutoScroll   = $true
 $pnlSecrets.BorderStyle  = "FixedSingle"
@@ -713,19 +713,19 @@ Load-ProjectType "Claude Code Assistant"
 $btnAdd           = New-Object System.Windows.Forms.Button
 $btnAdd.Text      = "+ Add Secret"
 $btnAdd.Font      = New-Object System.Drawing.Font("Segoe UI", 9)
-$btnAdd.Location  = New-Object System.Drawing.Point(15, 580)
+$btnAdd.Location  = New-Object System.Drawing.Point(15, 595)
 $btnAdd.Size      = New-Object System.Drawing.Size(120, 28)
 $btnAdd.FlatStyle = "Flat"
 $btnAdd.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
-$btnAdd.ForeColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
-$btnAdd.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
+$btnAdd.ForeColor = [System.Drawing.Color]::White
+$btnAdd.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnAdd.FlatAppearance.BorderSize  = 1
 $btnAdd.Add_Click({ Add-SecretRow "" })
 
 $btnClear           = New-Object System.Windows.Forms.Button
 $btnClear.Text      = "Clear Values"
 $btnClear.Font      = New-Object System.Drawing.Font("Segoe UI", 9)
-$btnClear.Location  = New-Object System.Drawing.Point(148, 580)
+$btnClear.Location  = New-Object System.Drawing.Point(148, 595)
 $btnClear.Size      = New-Object System.Drawing.Size(110, 28)
 $btnClear.FlatStyle = "Flat"
 $btnClear.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
@@ -743,12 +743,13 @@ $btnClear.Add_Click({
 $btnViewVault           = New-Object System.Windows.Forms.Button
 $btnViewVault.Text      = "View Vault"
 $btnViewVault.Font      = New-Object System.Drawing.Font("Segoe UI", 9)
-$btnViewVault.Location  = New-Object System.Drawing.Point(267, 580)
+$btnViewVault.Location  = New-Object System.Drawing.Point(267, 595)
 $btnViewVault.Size      = New-Object System.Drawing.Size(100, 28)
 $btnViewVault.FlatStyle = "Flat"
-$btnViewVault.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
+$btnViewVault.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
 $btnViewVault.ForeColor = [System.Drawing.Color]::White
-$btnViewVault.FlatAppearance.BorderSize = 0
+$btnViewVault.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
+$btnViewVault.FlatAppearance.BorderSize  = 1
 $btnViewVault.Add_Click({
     Start-Process "rundll32.exe" -ArgumentList "keymgr.dll, KRShowKeyMgr"
     Set-Status "Windows Credential Manager opened." ([System.Drawing.Color]::FromArgb(70, 150, 240))
@@ -759,14 +760,14 @@ $lblDivider           = New-Object System.Windows.Forms.Label
 $lblDivider.Text      = ""
 $lblDivider.BorderStyle = "FixedSingle"
 $lblDivider.BackColor = [System.Drawing.Color]::FromArgb(62, 62, 72)
-$lblDivider.Location  = New-Object System.Drawing.Point(15, 618)
+$lblDivider.Location  = New-Object System.Drawing.Point(15, 633)
 $lblDivider.Size      = New-Object System.Drawing.Size(588, 1)
 
 # -- Store + Close --------------------------------------------------
 $btnStore           = New-Object System.Windows.Forms.Button
 $btnStore.Text      = "Store to Vault + Generate Script"
 $btnStore.Font      = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
-$btnStore.Location  = New-Object System.Drawing.Point(15, 630)
+$btnStore.Location  = New-Object System.Drawing.Point(15, 645)
 $btnStore.Size      = New-Object System.Drawing.Size(470, 36)
 $btnStore.FlatStyle = "Flat"
 $btnStore.BackColor = [System.Drawing.Color]::FromArgb(14, 90, 158)
@@ -901,7 +902,7 @@ $btnStore.Add_Click({
 $btnClose           = New-Object System.Windows.Forms.Button
 $btnClose.Text      = "Close"
 $btnClose.Font      = New-Object System.Drawing.Font("Segoe UI", 10)
-$btnClose.Location  = New-Object System.Drawing.Point(494, 630)
+$btnClose.Location  = New-Object System.Drawing.Point(494, 645)
 $btnClose.Size      = New-Object System.Drawing.Size(109, 36)
 $btnClose.FlatStyle = "Flat"
 $btnClose.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
@@ -1003,7 +1004,7 @@ function Get-ProjectPath {
 $btnLaunch           = New-Object System.Windows.Forms.Button
 $btnLaunch.Text      = "Launch Claude Code"
 $btnLaunch.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
-$btnLaunch.Location  = New-Object System.Drawing.Point(15, 690)
+$btnLaunch.Location  = New-Object System.Drawing.Point(15, 705)
 $btnLaunch.Size      = New-Object System.Drawing.Size(170, 36)
 $btnLaunch.FlatStyle = "Flat"
 $btnLaunch.BackColor = [System.Drawing.Color]::FromArgb(15, 15, 15)
@@ -1023,13 +1024,13 @@ $btnLaunch.Add_Click({
 $btnVSCode           = New-Object System.Windows.Forms.Button
 $btnVSCode.Text      = "Open in VS Code"
 $btnVSCode.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
-$btnVSCode.Location  = New-Object System.Drawing.Point(201, 690)
+$btnVSCode.Location  = New-Object System.Drawing.Point(201, 705)
 $btnVSCode.Size      = New-Object System.Drawing.Size(128, 36)
 $btnVSCode.FlatStyle = "Flat"
-$btnVSCode.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
+$btnVSCode.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
 $btnVSCode.ForeColor = [System.Drawing.Color]::White
 $btnVSCode.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
-$btnVSCode.FlatAppearance.BorderSize  = 0
+$btnVSCode.FlatAppearance.BorderSize  = 1
 $btnVSCode.Add_Click({
     $projectPath = Get-ProjectPath
     if ($null -eq $projectPath) { return }
@@ -1073,13 +1074,13 @@ $btnVSCode.Add_Click({
 $btnCursor           = New-Object System.Windows.Forms.Button
 $btnCursor.Text      = "Open in Cursor"
 $btnCursor.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
-$btnCursor.Location  = New-Object System.Drawing.Point(345, 690)
+$btnCursor.Location  = New-Object System.Drawing.Point(345, 705)
 $btnCursor.Size      = New-Object System.Drawing.Size(128, 36)
 $btnCursor.FlatStyle = "Flat"
-$btnCursor.BackColor = [System.Drawing.Color]::FromArgb(30, 40, 70)
+$btnCursor.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
 $btnCursor.ForeColor = [System.Drawing.Color]::White
-$btnCursor.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(30, 40, 70)
-$btnCursor.FlatAppearance.BorderSize  = 0
+$btnCursor.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(100, 110, 160)
+$btnCursor.FlatAppearance.BorderSize  = 1
 $btnCursor.Add_Click({
     $projectPath = Get-ProjectPath
     if ($null -eq $projectPath) { return }
@@ -1123,12 +1124,12 @@ $btnCursor.Add_Click({
 $btnScanLink           = New-Object System.Windows.Forms.Button
 $btnScanLink.Text      = "scan.domitek.ai"
 $btnScanLink.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
-$btnScanLink.Location  = New-Object System.Drawing.Point(489, 690)
+$btnScanLink.Location  = New-Object System.Drawing.Point(489, 705)
 $btnScanLink.Size      = New-Object System.Drawing.Size(114, 36)
 $btnScanLink.FlatStyle = "Flat"
 $btnScanLink.BackColor = [System.Drawing.Color]::FromArgb(42, 42, 50)
-$btnScanLink.ForeColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
-$btnScanLink.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(70, 150, 240)
+$btnScanLink.ForeColor = [System.Drawing.Color]::White
+$btnScanLink.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(0, 120, 215)
 $btnScanLink.FlatAppearance.BorderSize  = 1
 $btnScanLink.Add_Click({ Start-Process "https://scan.domitek.ai" })
 
@@ -1156,7 +1157,7 @@ function Update-ProtectionButton {
 
 $btnProtect           = New-Object System.Windows.Forms.Button
 $btnProtect.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
-$btnProtect.Location  = New-Object System.Drawing.Point(15, 750)
+$btnProtect.Location  = New-Object System.Drawing.Point(15, 765)
 $btnProtect.Size      = New-Object System.Drawing.Size(588, 36)
 $btnProtect.FlatStyle = "Flat"
 $btnProtect.FlatAppearance.BorderSize = 0
@@ -1220,7 +1221,7 @@ $lblStatus           = New-Object System.Windows.Forms.Label
 $lblStatus.Text      = "Ready - Domitek Secrets Manager v1.5 | scan.domitek.ai"
 $lblStatus.Font      = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
 $lblStatus.ForeColor = [System.Drawing.Color]::FromArgb(160, 160, 175)
-$lblStatus.Location  = New-Object System.Drawing.Point(15, 810)
+$lblStatus.Location  = New-Object System.Drawing.Point(15, 825)
 $lblStatus.Size      = New-Object System.Drawing.Size(588, 48)
 $lblStatus.AutoSize  = $false
 $lblStatus.MaximumSize = New-Object System.Drawing.Size(588, 48)
@@ -1230,7 +1231,7 @@ $lblCopyright           = New-Object System.Windows.Forms.Label
 $lblCopyright.Text      = "Copyright (c) 2026 Domitek. All rights reserved.  |  Author: Libis R. Bueno  |  scan.domitek.ai"
 $lblCopyright.Font      = New-Object System.Drawing.Font("Segoe UI", 8)
 $lblCopyright.ForeColor = [System.Drawing.Color]::FromArgb(130, 130, 145)
-$lblCopyright.Location  = New-Object System.Drawing.Point(15, 918)
+$lblCopyright.Location  = New-Object System.Drawing.Point(15, 933)
 $lblCopyright.Size      = New-Object System.Drawing.Size(588, 18)
 $lblCopyright.TextAlign = "MiddleCenter"
 
